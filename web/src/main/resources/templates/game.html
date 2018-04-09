@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>XL Spaceship: Current game.</title>
+    <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
+    <script type="text/javascript">
+        jQuery(document).ready(function ($) {
+            var myselfId = $('#userId').val();
+            var playerTurnId = $('#playerTurn').val();
+            var opponentId = $('#opponentId').val();
+            var wonId = $('#won').val();
+            var gameId = $('#gameId').val();
+
+            if (myselfId === wonId) {
+                alert("You won!");
+            } else if (opponentId === wonId) {
+                alert("You lose!");
+            } else if (playerTurnId === 'AI') {
+                window.location.href = "/gameId/" + gameId;
+            }
+        });
+
+        function addShot(el) {
+            var aliveShips = $('#aliveShips').val();
+
+            var imgId = el.id;
+            $('#' + imgId).removeAttr('onclick');
+            $('#' + imgId).attr('src', "../../im/shot.png");
+
+            // add salvo
+            var salvo = $('#salvo').val();
+            salvo = salvo + imgId;
+
+            // salvo count
+            var salvoCount = parseInt($('#salvoCount').val());
+            salvoCount = salvoCount + 1;
+            $('#salvoCount').val(salvoCount);
+
+            if (salvoCount >= aliveShips) {
+                var gameId = $('#gameId').val();
+                var array = new Array();
+                array = salvo.split(",");
+
+                var fireRequest = {}
+                fireRequest["salvo"] = array;
+
+                $.ajax({
+                    type: "PUT",
+                    contentType: "application/json",
+                    url: "/xl-spaceship/user/game/" + gameId + "/fire",
+                    data: JSON.stringify(fireRequest),
+                    dataType: 'json',
+                    timeout: 5000,
+                    success: function (data) {
+                        window.location.href = "/gameId/" + gameId;
+                    },
+                    error: function (data, status, error) {
+                        var jsonError = jQuery.parseJSON(data.responseText);
+                        alert(jsonError.error_message); // very crude approach
+                        window.location.href = "/gameId/" + gameId;
+                    }
+                });
+
+            } else {
+                salvo = salvo + ",";
+            }
+            $('#salvo').val(salvo);
+        }
+    </script>
+</head>
+<body>
+<div>
+    <h1>XL Spaceship: Current game.</h1>
+    <br/>
+    <div>
+        <input id="salvoCount" type="hidden" value="0" readonly="readonly"/>
+        <input id="gameId" type="hidden" th:value="${gameId}" readonly="readonly"/>
+
+        <table>
+            <tr>
+                <td>Myself</td>
+                <td><input type="text" th:id="userId" th:name="${gameStatus.self.userId}"
+                           th:value="${gameStatus.self.userId}"
+                           readonly="readonly" disabled="disabled"/>
+                </td>
+            </tr>
+            <tr>
+                <td>Opponent</td>
+                <td><input type="text" th:id="opponentId" th:name="${gameStatus.opponent.userId}"
+                           th:value="${gameStatus.opponent.userId}"
+                           readonly="readonly" disabled="disabled"/>
+                </td>
+            </tr>
+            <tr>
+                <td>Turn</td>
+                <td>
+                    <input type="text" th:id="playerTurn" th:value="${playerTurn}" readonly="readonly"
+                           disabled="disabled"/>
+                </td>
+            </tr>
+            <tr>
+                <td>Won</td>
+                <td>
+                    <input type="text" th:id="won" th:value="${won}" readonly="readonly" disabled="disabled"/>
+                </td>
+            </tr>
+            <tr>
+                <td>Salvo</td>
+                <td>
+                    <input id="salvo" type="text" value="" readonly="readonly" disabled="disabled"/>
+                </td>
+            </tr>
+            <tr>
+                <td>Alive ships</td>
+                <td>
+                    <input id="aliveShips" type="text" th:value="${aliveShips}" readonly="readonly"
+                           disabled="disabled"/>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <div>
+        <table>
+            <tr row="class">
+                <td>
+                    <form id="myGrid" th:inline="html">
+                        [(${myGrid})]
+                    </form>
+                </td>
+                <td>
+                    &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+                </td>
+                <td>
+                    <form id="opponentGrid" th:inline="html">
+                        [(${opponentGrid})]
+                    </form>
+                </td>
+            </tr>
+        </table>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>XL Spaceship : New Game.</title>
+    <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
+    <script type="text/javascript">
+        jQuery(document).ready(function ($) {
+            $("#newGameForm").submit(function (event) {
+                // Prevent the form from submitting via the browser.
+                event.preventDefault();
+
+                createNewGameViaAjax();
+            });
+        });
+
+        function createNewGameViaAjax() {
+            var sp = {}
+            sp["hostname"] = $("#hostname").val();
+            sp["port"] = $("#port").val();
+
+            $.ajax({
+                type: "POST",
+                contentType: "application/json; charset=utf-8",
+                url: "/xl-spaceship/user/game/new",
+                data: JSON.stringify(sp),
+                dataType: 'json',
+                timeout: 5000,
+                success: function (response) {
+                    var id = response.game_id;
+                    window.location.href = "/gameId/" + id;
+                },
+                error: function (data, status, error) {
+                    var jsonError = jQuery.parseJSON(data.responseText);
+                    alert(jsonError.error_message); // very crude approach
+                },
+                done: function (e) {
+                    console.log("DONE");
+                }
+            });
+        }
+    </script>
+</head>
+<body>
+<div>
+    <h1>XL Spaceship: New Game.</h1>
+    <br/>
+
+    <div>
+        <table>
+            <tr>
+                <td>Pilot Id</td>
+                <td><input type="text" th:id="${pilot.userId}" th:name="${pilot.userId}" th:value="${pilot.userId}"
+                           readonly="readonly" disabled="disabled"/>
+                </td>
+            </tr>
+            <tr>
+                <td>Pilot Name</td>
+                <td><input type="text" th:id="${pilot.fullName}" th:name="${pilot.fullName}"
+                           th:value="${pilot.fullName}" readonly="readonly" disabled="disabled"/>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <br/>
+    <br/>
+    Remote XL Spaceship instance:
+    <br/>
+    <div>
+        <form id="newGameForm">
+            <table>
+                <tr>
+                    <td>Host</td>
+                    <td><input type="text" id="hostname"/></td>
+                </tr>
+                <tr>
+                    <td>Port</td>
+                    <td><input type="text" id="port"/></td>
+                </tr>
+                <tr>
+                    <td>
+                        <button type="submit">Create New Game</button>
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </div>
+</div>
+</body>
+</html>
