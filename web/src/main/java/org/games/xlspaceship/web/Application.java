@@ -25,21 +25,18 @@ public class Application implements ApplicationRunner {
 
     private static final Logger log = LoggerFactory.getLogger(Application.class);
 
-    private static final String TWO_PARAMS_ERROR = "XL Spaceship instance required two incoming parameters.";
-    private static final String USER_MESSAGE = "XL Spaceship Application is going to be managed by user = '%s' where 'Full Name' = '%s'.";
-
     @Autowired
     private UserServices userServices;
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
         Object[] sources = {Application.class};
         SpringApplication.run(sources, args);
 
-        log.warn("XL Spaceship Application has started.");
+        log.info("XL Spaceship Application has started.");
     }
 
     @Override
-    public void run(ApplicationArguments args) throws Exception {
+    public void run(ApplicationArguments args) {
         String[] cmdArgs = args.getSourceArgs();
         setUpUser(cmdArgs);
     }
@@ -47,6 +44,7 @@ public class Application implements ApplicationRunner {
     private void setUpUser(String[] args) {
         String user = null;
         String fullName = null;
+
         if (args != null && args.length == 2) {
             user = args[0];
             fullName = args[1];
@@ -55,15 +53,14 @@ public class Application implements ApplicationRunner {
             userServices.setFullName(fullName);
         } else {
             if (args != null && args.length == 1) {
-                log.warn(TWO_PARAMS_ERROR);
+                log.warn("XL Spaceship instance requires two incoming parameters.");
             }
             userServices.setUpAI();
         }
-        log.info(String.format(
-                USER_MESSAGE,
+        log.info("XL Spaceship Application is going to be managed by user = '{}' where 'Full Name' = '{}'.",
                 userServices.getUserId(),
                 userServices.getFullName()
-        ));
+        );
     }
 
 

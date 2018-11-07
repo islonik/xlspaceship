@@ -54,7 +54,7 @@ public class ProtocolResource {
             consumes = MediaType.APPLICATION_JSON_VALUE
     )
     public NewGameResponse createNewGame(@RequestBody NewGameRequest newGameRequest) {
-        log.info(newGameRequest.toString());
+        log.info("A new game request {}", newGameRequest);
 
         return xlSpaceshipServices.createRemoteGame(newGameRequest);
     }

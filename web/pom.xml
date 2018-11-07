@@ -19,6 +19,7 @@
             <artifactId>impl</artifactId>
             <version>${project.version}</version>
         </dependency>
+
     </dependencies>
 
     <build>
@@ -27,7 +28,7 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
-                <version>1.5.6.RELEASE</version>
+                <version>1.5.17.RELEASE</version>
                 <configuration>
                     <fork>true</fork>
                     <mainClass>org.games.xlspaceship.web.Application</mainClass>

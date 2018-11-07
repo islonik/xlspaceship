@@ -1,6 +1,26 @@
-# Logs
-logs
+# Ignore following directories and files
+# other version control
+.svn/
+
+# Eclipse workspace
+.metadata/
+.recommenders/
+RemoteSystemsTempFiles/
+.settings/
+.classpath
+.project
+#Intellij Idea
+.idea/
+*.iml
+
+# binaries
+bin/
+target/
+*.class
+
+# some non-source directories and files
 *.log
+logs
 npm-debug.log*
 
 *.sublime-workspace
