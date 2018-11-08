@@ -4,15 +4,13 @@ import org.games.xlspaceship.impl.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.context.annotation.Bean;
 import org.springframework.core.env.Environment;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.net.InetAddress;
-import java.net.URI;
 
 @Service
 public class RestServices {
@@ -28,6 +26,14 @@ public class RestServices {
 
     @Autowired
     private UserServices userServices;
+
+    @Autowired
+    private RestTemplate restTemplate;
+
+    @Bean
+    public RestTemplate getRestTemplate() {
+        return new RestTemplate();
+    }
 
     public int getCurrentPort() {
         return Integer.parseInt(environment.getProperty("server.port"));
@@ -45,11 +51,6 @@ public class RestServices {
     public NewGameResponse sendPostNewGameRequest(String remoteHost, int remotePort, SpaceshipProtocol spaceshipProtocol) {
         String url = String.format(NEW_GAME_REQUEST, remoteHost, remotePort);
 
-        RestTemplateBuilder restTemplateBuilder = new RestTemplateBuilder();
-        RestTemplate restTemplate = restTemplateBuilder
-                .rootUri(url)
-                .build();
-
         NewGameRequest newGameRequest = new NewGameRequest();
         newGameRequest.setUserId(userServices.getUserId());
         newGameRequest.setFullName(userServices.getFullName());
@@ -64,11 +65,6 @@ public class RestServices {
     public FireResponse fireShot(String remoteHost, int remotePort, String gameId, FireRequest fireRequest) {
         String url = String.format(FIRE_REQUEST, remoteHost, remotePort, gameId);
 
-        RestTemplateBuilder restTemplateBuilder = new RestTemplateBuilder();
-        RestTemplate restTemplate = restTemplateBuilder
-                .rootUri(url)
-                .build();
-
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<FireRequest> httpEntity = new HttpEntity<>(fireRequest, headers);
@@ -77,8 +73,6 @@ public class RestServices {
 
     public FireResponse fireShotByAi(String localHost, int localPort, String gameId, FireRequest fireRequest) {
         String url = String.format(FIRE_REQUEST_AI, localHost, localPort, gameId);
-
-        RestTemplate restTemplate = new RestTemplate();
 
         HttpEntity<FireRequest> entity = new HttpEntity<>(fireRequest);
         ResponseEntity<FireResponse> response = restTemplate.exchange(url, HttpMethod.PUT, entity, FireResponse.class);
