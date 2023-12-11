@@ -4,12 +4,6 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <parent>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-parent</artifactId>
-        <version>1.5.17.RELEASE</version>
-    </parent>
-
     <groupId>org.games</groupId>
     <artifactId>xlspaceship</artifactId>
 
@@ -22,20 +16,27 @@
     </modules>
 
     <properties>
+        <spring.boot>3.2.0</spring.boot>
         <thymeleaf.version>3.0.7.RELEASE</thymeleaf.version>
         <thymeleaf-layout-dialect.version>2.2.2</thymeleaf-layout-dialect.version>
         <spring-cloud.version>Dalston.SR1</spring-cloud.version>
-        <mockito.version>2.23.0</mockito.version>
+        <junit5.version>5.10.1</junit5.version>
+        <mockito.version>5.4.0</mockito.version>
     </properties>
 
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>org.springframework.cloud</groupId>
-                <artifactId>spring-cloud-dependencies</artifactId>
-                <version>${spring-cloud.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-web</artifactId>
+                <version>${spring.boot}</version>
+                <!-- to avoid clash with another logging implementation -->
+                <exclusions>
+                    <exclusion>
+                        <groupId>ch.qos.logback</groupId>
+                        <artifactId>logback-classic</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -44,33 +45,49 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter</artifactId>
+            <version>${spring.boot}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-validation</artifactId>
+            <version>${spring.boot}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
+            <version>${spring.boot}</version>
         </dependency>
         <!-- Compile -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-thymeleaf</artifactId>
+            <version>${spring.boot}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>
+            <version>${spring.boot}</version>
         </dependency>
 
-        <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-sleuth</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-zipkin</artifactId>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.cloud</groupId>-->
+<!--            <artifactId>spring-cloud-starter-sleuth</artifactId>-->
+<!--        </dependency>-->
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.cloud</groupId>-->
+<!--            <artifactId>spring-cloud-starter-zipkin</artifactId>-->
+<!--        </dependency>-->
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
+            <version>${spring.boot}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <version>${junit5.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -86,76 +103,16 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.8.0</version>
+                <version>3.11.0</version>
                 <configuration>
+                    <release>17</release>
                     <showWarnings>true</showWarnings>
                     <encoding>UTF-8</encoding>
-                    <source>1.8</source>
-                    <target>1.8</target>
                     <showDeprecation>true</showDeprecation>
                     <maxmem>512m</maxmem>
                 </configuration>
             </plugin>
         </plugins>
     </build>
-
-    <!-- to execute use: mvn clean package -P findbugs -->
-    <profiles>
-        <profile>
-            <id>findbugs</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-            </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>findbugs-maven-plugin</artifactId>
-                        <version>3.0.4</version>
-                        <configuration>
-                            <!-- Build doesn't fail if problems are found -->
-                            <failOnError>false</failOnError>
-                            <!--
-                                Enables analysis which takes more memory but finds more bugs.
-                                If you run out of memory, changes the value of the effort element
-                                to 'low'.
-                            -->
-                            <effort>Max</effort>
-                            <!-- Reports all bugs (other values are medium and max) -->
-                            <threshold>Low</threshold>
-                            <!-- Produces XML report -->
-                            <xmlOutput>true</xmlOutput>
-                            <!-- Configures the directory in which the XML report is created -->
-                            <findbugsXmlOutputDirectory>${project.build.directory}/findbugs</findbugsXmlOutputDirectory>
-                        </configuration>
-                        <executions>
-                            <execution>
-                                <id>noFailOnError</id>
-                                <phase>test</phase>
-                                <goals>
-                                    <goal>findbugs</goal>
-                                </goals>
-                                <configuration>
-                                    <failOnError>false</failOnError>
-                                    <maxRank>20</maxRank>
-                                </configuration>
-                            </execution>
-                            <execution>
-                                <id>failOnError</id>
-                                <phase>package</phase>
-                                <goals>
-                                    <goal>check</goal>
-                                </goals>
-                                <configuration>
-                                    <failOnError>true</failOnError>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
-
 
 </project>

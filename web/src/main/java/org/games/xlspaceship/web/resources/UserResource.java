@@ -43,7 +43,7 @@ public class UserResource {
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     public ResponseEntity<?> getStatusByGameId(
-            @PathVariable String gameId) {
+            @PathVariable("gameId") String gameId) {
 
         boolean isExist = xl.isGameIdExist(gameId);
         if (!isExist) {
@@ -153,7 +153,7 @@ public class UserResource {
             consumes = MediaType.APPLICATION_JSON_VALUE
     )
     public ResponseEntity<?> shotByMyself(
-            @PathVariable String gameId,
+            @PathVariable("gameId") String gameId,
             @RequestBody FireRequest fireRequestByMyself) {
         ResponseEntity validResponse = validationServices.validateFireRequest(fireRequestByMyself);
         if (validResponse != null) {

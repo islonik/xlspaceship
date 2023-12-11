@@ -29,10 +29,8 @@ public class Application implements ApplicationRunner {
     private UserServices userServices;
 
     public static void main(String[] args) {
-        Object[] sources = {Application.class};
-        SpringApplication.run(sources, args);
-
         log.info("XL Spaceship Application has started.");
+        SpringApplication.run(Application.class, args);
     }
 
     @Override

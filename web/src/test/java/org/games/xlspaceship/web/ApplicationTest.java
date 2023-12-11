@@ -4,30 +4,27 @@ import org.games.xlspaceship.impl.game.GameStatus;
 import org.games.xlspaceship.impl.game.GridStatus;
 import org.games.xlspaceship.impl.model.*;
 import org.games.xlspaceship.impl.services.RestServices;
-import org.junit.Assert;
-import org.junit.FixMethodOrder;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.MethodSorters;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @ActiveProfiles("test")
-@RunWith(SpringJUnit4ClassRunner.class)
+@ExtendWith(SpringExtension.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT,
         properties = {
                 ApplicationTest.AI_PORT
         }
 )
-@FixMethodOrder(value = MethodSorters.NAME_ASCENDING)
 public class ApplicationTest {
 
     private static final Logger log = LoggerFactory.getLogger(ApplicationTest.class);
@@ -48,17 +45,20 @@ public class ApplicationTest {
         SpaceshipProtocol sp = new SpaceshipProtocol();
         sp.setHostname("127.0.0.1");
         sp.setPort(REMOTE_PORT);
-        NewGameResponse ngr = this.restTemplate.postForObject("/xl-spaceship/user/game/new", sp, NewGameResponse.class);
-        Assert.assertNotNull(ngr);
-        Assert.assertEquals("AI", ngr.getUserId());
-        Assert.assertEquals("AI-1000", ngr.getFullName());
-        Assert.assertEquals("match-1-3-6", ngr.getGameId());
 
-        GameStatus gameStatus = this.restTemplate.getForObject("/xl-spaceship/user/game/{gameId}", GameStatus.class, ngr.getGameId());
-        Assert.assertNotNull(gameStatus);
+        NewGameResponse ngr = this.restTemplate.postForObject("/xl-spaceship/user/game/new", sp, NewGameResponse.class);
+        Assertions.assertNotNull(ngr);
+        Assertions.assertEquals("AI", ngr.getUserId());
+        Assertions.assertEquals("AI-1000", ngr.getFullName());
+        Assertions.assertEquals("match-1-3-6", ngr.getGameId());
+
+        GameStatus gameStatus = this.restTemplate.getForObject("/xl-spaceship/user/game/%s".formatted(ngr.getGameId()), GameStatus.class);
+
+        Assertions.assertNotNull(gameStatus);
+        Assertions.assertNotNull(gameStatus.getSelf());
         GridStatus myGrid = gameStatus.getSelf();
 
-        Assert.assertEquals(
+        Assertions.assertEquals(
                 "...**......**...\n" +
                         "...*.*....*.....\n" +
                         "...**......**...\n" +
@@ -84,7 +84,7 @@ public class ApplicationTest {
         String gameId = "match-1-3-6";
         GameStatus gameStatus = this.restTemplate.getForObject("/xl-spaceship/user/game/{gameId}", GameStatus.class, gameId);
 
-        Assert.assertNotNull(gameStatus);
+        Assertions.assertNotNull(gameStatus);
 
         FireRequest fireRequest = new FireRequest();
         List<String> salvoList = new ArrayList<>();
@@ -96,12 +96,12 @@ public class ApplicationTest {
         fireRequest.setSalvo(salvoList);
 
         FireResponse fireResponse = restServices.fireShotByAi("127.0.0.1", Integer.parseInt(REMOTE_PORT), gameId, fireRequest);
-        Assert.assertNotNull(fireResponse);
-        Assert.assertNotNull("miss", fireResponse.getSalvo().get("0x0"));
-        Assert.assertNotNull("miss", fireResponse.getSalvo().get("1x1"));
-        Assert.assertNotNull("miss", fireResponse.getSalvo().get("2x2"));
-        Assert.assertNotNull("hit", fireResponse.getSalvo().get("3x3"));
-        Assert.assertNotNull("hit", fireResponse.getSalvo().get("4x4"));
+        Assertions.assertNotNull(fireResponse);
+        Assertions.assertNotNull("miss", fireResponse.getSalvo().get("0x0"));
+        Assertions.assertNotNull("miss", fireResponse.getSalvo().get("1x1"));
+        Assertions.assertNotNull("miss", fireResponse.getSalvo().get("2x2"));
+        Assertions.assertNotNull("hit", fireResponse.getSalvo().get("3x3"));
+        Assertions.assertNotNull("hit", fireResponse.getSalvo().get("4x4"));
     }
 
     @Test
@@ -110,8 +110,8 @@ public class ApplicationTest {
         sp.setHostname("127.0.0.1");
         sp.setPort("8001"); // fake port
         ErrorResponse error = this.restTemplate.postForObject("/xl-spaceship/user/game/new", sp, ErrorResponse.class);
-        Assert.assertNotNull(error);
-        Assert.assertEquals(CONNECTION_REFUSED, error.getError());
+        Assertions.assertNotNull(error);
+        Assertions.assertEquals(CONNECTION_REFUSED, error.getError());
     }
 
     private String getMyGrid(GridStatus gridStatus) {

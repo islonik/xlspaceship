@@ -1,14 +1,14 @@
 package org.games.xlspaceship.impl.model;
 
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
 public class SpaceshipProtocol {
 
-    @NotNull
+    @NotBlank(message = "Hostname is mandatory")
     private String hostname;
 
-    @NotNull
+    @NotBlank(message = "Port is mandatory")
     @Size(min=4, max=4)
     private String port;
 

@@ -89,7 +89,7 @@ public class ProtocolResource {
             consumes = MediaType.APPLICATION_JSON_VALUE
     )
     public ResponseEntity<?> shotByOpponent(
-            @PathVariable String gameId,
+            @PathVariable("gameId") String gameId,
             @RequestBody FireRequest fireRequestByOpponent) {
         ResponseEntity validResponse = validationServices.validateFireRequest(fireRequestByOpponent);
         if (validResponse != null) {

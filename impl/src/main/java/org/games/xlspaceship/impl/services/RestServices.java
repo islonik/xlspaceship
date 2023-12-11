@@ -20,19 +20,20 @@ public class RestServices {
     private static final String NEW_GAME_REQUEST = "http://%s:%s/xl-spaceship/protocol/game/new";
     private static final String FIRE_REQUEST = "http://%s:%s/xl-spaceship/protocol/game/%s";
     private static final String FIRE_REQUEST_AI = "http://%s:%s/xl-spaceship/user/game/%s/fire";
+    private final Environment environment;
+    private final UserServices userServices;
+    private final RestTemplate restTemplate;
+
+//    @Bean
+//    public RestTemplate getRestTemplate() {
+//        return new RestTemplate();
+//    }
 
     @Autowired
-    private Environment environment;
-
-    @Autowired
-    private UserServices userServices;
-
-    @Autowired
-    private RestTemplate restTemplate;
-
-    @Bean
-    public RestTemplate getRestTemplate() {
-        return new RestTemplate();
+    public RestServices(Environment environment, UserServices userServices) {
+        this.environment = environment;
+        this.userServices = userServices;
+        this.restTemplate = new RestTemplate();
     }
 
     public int getCurrentPort() {

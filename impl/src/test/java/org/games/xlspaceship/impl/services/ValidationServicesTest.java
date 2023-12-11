@@ -1,11 +1,10 @@
 package org.games.xlspaceship.impl.services;
 
 import org.games.xlspaceship.impl.model.FireRequest;
-import org.junit.Assert;
-import org.junit.Test;
-
 import java.util.ArrayList;
 import java.util.List;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class ValidationServicesTest {
 
@@ -21,7 +20,7 @@ public class ValidationServicesTest {
         FireRequest fireRequest = new FireRequest();
         fireRequest.setSalvo(salvo);
 
-        Assert.assertNull(validationServices.validateFireRequest(fireRequest));
+        Assertions.assertNull(validationServices.validateFireRequest(fireRequest));
     }
 
     @Test
@@ -37,7 +36,7 @@ public class ValidationServicesTest {
         FireRequest fireRequest = new FireRequest();
         fireRequest.setSalvo(salvo);
 
-        Assert.assertEquals(
+        Assertions.assertEquals(
                 ValidationServices.MORE_THEN_5,
                 validationServices.validateFireRequest(fireRequest).getBody().toString()
         );
@@ -55,7 +54,7 @@ public class ValidationServicesTest {
         FireRequest fireRequest = new FireRequest();
         fireRequest.setSalvo(salvo);
 
-        Assert.assertEquals(
+        Assertions.assertEquals(
                 "Wrong format. Shot = '10x10'.",
                 validationServices.validateFireRequest(fireRequest).getBody().toString()
         );
@@ -69,7 +68,7 @@ public class ValidationServicesTest {
         FireRequest fireRequest = new FireRequest();
         fireRequest.setSalvo(salvo);
 
-        Assert.assertEquals(
+        Assertions.assertEquals(
                 "Wrong format. Shot = '0y0'.",
                 validationServices.validateFireRequest(fireRequest).getBody().toString()
         );
@@ -83,7 +82,7 @@ public class ValidationServicesTest {
         FireRequest fireRequest = new FireRequest();
         fireRequest.setSalvo(salvo);
 
-        Assert.assertEquals(
+        Assertions.assertEquals(
                 "Wrong format. Shot = 'Gx0'.",
                 validationServices.validateFireRequest(fireRequest).getBody().toString()
         );
@@ -97,7 +96,7 @@ public class ValidationServicesTest {
         FireRequest fireRequest = new FireRequest();
         fireRequest.setSalvo(salvo);
 
-        Assert.assertEquals(
+        Assertions.assertEquals(
                 "Wrong format. Shot = '0xG'.",
                 validationServices.validateFireRequest(fireRequest).getBody().toString()
         );

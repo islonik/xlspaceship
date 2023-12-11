@@ -2,16 +2,16 @@ package org.games.xlspaceship.impl.services;
 
 import org.games.xlspaceship.impl.game.Grid;
 import org.games.xlspaceship.impl.game.ships.Spaceship;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class GridServicesTest {
 
     private GridServices gridServices;
     private RandomServices randomServices;
 
-    @Before
+    @BeforeEach
     public void before() {
         randomServices = new RandomServices();
         gridServices = new GridServices();
@@ -23,14 +23,14 @@ public class GridServicesTest {
         Grid grid = gridServices.newRandomGrid();
         System.out.println(grid.toString());
 
-        Assert.assertNotNull(grid.toString());
-        Assert.assertEquals(5, grid.getSpaceshipList().size());
+        Assertions.assertNotNull(grid.toString());
+        Assertions.assertEquals(5, grid.getSpaceshipList().size());
 
         int count = 0;
         for (Spaceship spaceship : grid.getSpaceshipList()) {
             count += spaceship.getLives();
         }
-        Assert.assertEquals(41, count);
+        Assertions.assertEquals(41, count);
     }
 
     @Test
@@ -47,7 +47,7 @@ public class GridServicesTest {
             if (count != 41) {
                 System.out.println(grid.toString());
             }
-            Assert.assertEquals(41, count);
+            Assertions.assertEquals(41, count);
         }
     }
 }

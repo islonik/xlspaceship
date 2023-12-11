@@ -1,15 +1,15 @@
 package org.games.xlspaceship.impl.game;
 
 import org.games.xlspaceship.impl.game.ships.Winger;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class GridTest {
 
     @Test
     public void testToStringCase01() {
         Grid grid = new Grid();
-        Assert.assertEquals("................\n" +
+        Assertions.assertEquals("................\n" +
                         "................\n" +
                         "................\n" +
                         "................\n" +
@@ -37,7 +37,7 @@ public class GridTest {
 
         grid.printSpaceship(0, 0, winger);
 
-        Assert.assertEquals(
+        Assertions.assertEquals(
                 "*.*.............\n" +
                         "*.*.............\n" +
                         ".*..............\n" +
@@ -66,7 +66,7 @@ public class GridTest {
 
         grid.printSpaceship(0, 0, winger);
 
-        Assert.assertEquals(
+        Assertions.assertEquals(
                 "**.**...........\n" +
                         "..*.............\n" +
                         "**.**...........\n" +
@@ -95,10 +95,10 @@ public class GridTest {
         int x = 16 - winger.getWidth();
         int y = 16 - winger.getHeight();
 
-        Assert.assertTrue(grid.isSettable(x, y, winger));
+        Assertions.assertTrue(grid.isSettable(x, y, winger));
         grid.printSpaceship(x, y, winger);
 
-        Assert.assertEquals(
+        Assertions.assertEquals(
                 "................\n" +
                         "................\n" +
                         "................\n" +
@@ -125,14 +125,14 @@ public class GridTest {
         Winger winger1 = new Winger( 1);
         Winger winger2 = new Winger( 2);
 
-        Assert.assertTrue(grid.isSettable(0, 0, winger1));
+        Assertions.assertTrue(grid.isSettable(0, 0, winger1));
         grid.printSpaceship(0, 0, winger1);
 
-        Assert.assertFalse(grid.isSettable(0, 0, winger2));
-        Assert.assertTrue(grid.isSettable(5, 5, winger2));
+        Assertions.assertFalse(grid.isSettable(0, 0, winger2));
+        Assertions.assertTrue(grid.isSettable(5, 5, winger2));
         grid.printSpaceship(5, 5, winger2);
 
-        Assert.assertEquals(
+        Assertions.assertEquals(
                 "*.*.............\n" +
                         "*.*.............\n" +
                         ".*..............\n" +
@@ -159,14 +159,14 @@ public class GridTest {
         Winger winger1 = new Winger( 1);
         Winger winger2 = new Winger( 2);
 
-        Assert.assertTrue(grid.isSettable(16 - winger1.getWidth(), 16 - winger1.getHeight(), winger1));
+        Assertions.assertTrue(grid.isSettable(16 - winger1.getWidth(), 16 - winger1.getHeight(), winger1));
         grid.printSpaceship(0, 0, winger1);
 
-        Assert.assertFalse(grid.isSettable(0, 0, winger2));
-        Assert.assertTrue(grid.isSettable(5, 5, winger2));
+        Assertions.assertFalse(grid.isSettable(0, 0, winger2));
+        Assertions.assertTrue(grid.isSettable(5, 5, winger2));
         grid.printSpaceship(5, 5, winger2);
 
-        Assert.assertEquals(
+        Assertions.assertEquals(
                 "*.*.............\n" +
                         "*.*.............\n" +
                         ".*..............\n" +
@@ -193,9 +193,9 @@ public class GridTest {
         for (int i = 0; i < 15; i++) {
             x++;
         }
-        //Assert.assertEquals(16, x);
+        //Assertions.assertEquals(16, x);
         String value = Integer.toString(x, 16);
-        Assert.assertEquals("f", value);
+        Assertions.assertEquals("f", value);
     }
 
 }

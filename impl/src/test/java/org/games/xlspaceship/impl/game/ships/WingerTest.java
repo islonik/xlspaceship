@@ -1,10 +1,10 @@
 package org.games.xlspaceship.impl.game.ships;
 
 import org.games.xlspaceship.impl.game.Cell;
-import org.junit.Assert;
-import org.junit.Test;
 
 import java.util.List;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class WingerTest {
 
@@ -14,8 +14,8 @@ public class WingerTest {
 
         List<Cell> shapeList = winger.shape();
 
-        Assert.assertEquals(15, shapeList.size());
-        Assert.assertEquals("[*, ., *, *, ., *, ., *, ., *, ., *, *, ., *]", shapeList.toString());
+        Assertions.assertEquals(15, shapeList.size());
+        Assertions.assertEquals("[*, ., *, *, ., *, ., *, ., *, ., *, *, ., *]", shapeList.toString());
     }
 
     @Test
@@ -24,7 +24,7 @@ public class WingerTest {
 
         List<Cell> shapeList = winger.shape();
 
-        Assert.assertEquals(15, shapeList.size());
-        Assert.assertEquals("[*, *, ., *, *, ., ., *, ., ., *, *, ., *, *]", shapeList.toString());
+        Assertions.assertEquals(15, shapeList.size());
+        Assertions.assertEquals("[*, *, ., *, *, ., ., *, ., ., *, *, ., *, *]", shapeList.toString());
     }
 }
