@@ -9,9 +9,9 @@ To be able to build this project you should have installed maven.
 
 To be able to run this project: you should launch run.sh and runAI.sh files (you can customize these files in advance).
 
-
+*******************************************
 ### How to enable pretty json output
-
+*******************************************
 <b>Attention!!!</b>
 
 If you are running a boot app but elected to configure the web application yourself, either by @EnableWebMvc annotation 

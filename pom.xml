@@ -23,7 +23,7 @@
 <!--        <spring-cloud.version>Dalston.SR1</spring-cloud.version>-->
 
         <junit5.version>5.10.1</junit5.version>
-        <mockito.version>5.4.0</mockito.version>
+        <mockito.version>5.8.0</mockito.version>
     </properties>
 
     <dependencyManagement>
