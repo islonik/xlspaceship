@@ -7,8 +7,6 @@ import org.games.xlspaceship.impl.services.RestServices;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
@@ -27,8 +25,6 @@ import java.util.List;
 )
 public class ApplicationTest {
 
-    private static final Logger log = LoggerFactory.getLogger(ApplicationTest.class);
-
     public static final String REMOTE_PORT = "8056";
 
     public static final String AI_PORT = "server.port=" + REMOTE_PORT;
@@ -41,7 +37,7 @@ public class ApplicationTest {
     private RestServices restServices;
 
     @Test
-    public void testCreateGameByUserAPICase01() throws Exception {
+    public void testCreateGameByUserAPICase01() {
         SpaceshipProtocol sp = new SpaceshipProtocol();
         sp.setHostname("127.0.0.1");
         sp.setPort(REMOTE_PORT);
@@ -59,22 +55,24 @@ public class ApplicationTest {
         GridStatus myGrid = gameStatus.getSelf();
 
         Assertions.assertEquals(
-                "...**......**...\n" +
-                        "...*.*....*.....\n" +
-                        "...**......**...\n" +
-                        "...*.*.......*..\n" +
-                        "...**......**...\n" +
-                        "................\n" +
-                        "...*.*..........\n" +
-                        "...*.*.....*....\n" +
-                        "....*.....*.*...\n" +
-                        "...*.*....***...\n" +
-                        "...*.*....*.*...\n" +
-                        "................\n" +
-                        ".......*........\n" +
-                        ".......*........\n" +
-                        ".......*........\n" +
-                        ".......***......\n",
+                """
+                ...**......**...
+                ...*.*....*.....
+                ...**......**...
+                ...*.*.......*..
+                ...**......**...
+                ................
+                ...*.*..........
+                ...*.*.....*....
+                ....*.....*.*...
+                ...*.*....***...
+                ...*.*....*.*...
+                ................
+                .......*........
+                .......*........
+                .......*........
+                .......***......
+                """,
                 getMyGrid(myGrid)
         );
     }
@@ -97,15 +95,15 @@ public class ApplicationTest {
 
         FireResponse fireResponse = restServices.fireShotByAi("127.0.0.1", Integer.parseInt(REMOTE_PORT), gameId, fireRequest);
         Assertions.assertNotNull(fireResponse);
-        Assertions.assertNotNull("miss", fireResponse.getSalvo().get("0x0"));
-        Assertions.assertNotNull("miss", fireResponse.getSalvo().get("1x1"));
-        Assertions.assertNotNull("miss", fireResponse.getSalvo().get("2x2"));
-        Assertions.assertNotNull("hit", fireResponse.getSalvo().get("3x3"));
-        Assertions.assertNotNull("hit", fireResponse.getSalvo().get("4x4"));
+        Assertions.assertEquals("miss", fireResponse.getSalvo().get("0x0"));
+        Assertions.assertEquals("miss", fireResponse.getSalvo().get("1x1"));
+        Assertions.assertEquals("miss", fireResponse.getSalvo().get("2x2"));
+        Assertions.assertEquals("hit", fireResponse.getSalvo().get("3x3"));
+        Assertions.assertEquals("hit", fireResponse.getSalvo().get("4x4"));
     }
 
     @Test
-    public void testCreateGameByUserAPICase03() throws Exception {
+    public void testCreateGameByUserAPICase03() {
         SpaceshipProtocol sp = new SpaceshipProtocol();
         sp.setHostname("127.0.0.1");
         sp.setPort("8001"); // fake port

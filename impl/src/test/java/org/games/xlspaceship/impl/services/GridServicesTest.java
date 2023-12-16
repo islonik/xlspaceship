@@ -9,13 +9,10 @@ import org.junit.jupiter.api.Test;
 public class GridServicesTest {
 
     private GridServices gridServices;
-    private RandomServices randomServices;
 
     @BeforeEach
     public void before() {
-        randomServices = new RandomServices();
-        gridServices = new GridServices();
-        gridServices.setRandomServices(randomServices);
+        gridServices = new GridServices(new RandomServices());
     }
 
     @Test
@@ -45,7 +42,7 @@ public class GridServicesTest {
                 }
             }
             if (count != 41) {
-                System.out.println(grid.toString());
+                System.out.println(grid);
             }
             Assertions.assertEquals(41, count);
         }

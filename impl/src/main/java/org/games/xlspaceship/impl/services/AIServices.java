@@ -1,37 +1,26 @@
 package org.games.xlspaceship.impl.services;
 
-import org.games.xlspaceship.impl.game.Grid;
-import org.games.xlspaceship.impl.game.GridStatus;
-import org.games.xlspaceship.impl.model.FireRequest;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.games.xlspaceship.impl.game.Grid;
+import org.games.xlspaceship.impl.game.GridStatus;
+import org.games.xlspaceship.impl.model.FireRequest;
+import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
+@RequiredArgsConstructor
 public class AIServices {
-
-    private static final Logger log = LoggerFactory.getLogger(AIServices.class);
 
     private static final ExecutorService executors = Executors.newFixedThreadPool(10);
 
-    @Autowired
-    private UserServices userServices;
-
-    @Autowired
-    private RandomServices randomServices;
-
-    @Autowired
-    private RestServices restServices;
-
-    public void setRandomServices(RandomServices randomServices) {
-        this.randomServices = randomServices;
-    }
+    private final UserServices userServices;
+    private final RandomServices randomServices;
+    private final RestServices restServices;
 
     public void asyncFireRequest(final String playerTurn, final String gameId, final int aliveShips, final GridStatus opponent) {
         if (userServices.isAI() && userServices.getUserId().equalsIgnoreCase(playerTurn) && aliveShips > 0) {

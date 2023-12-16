@@ -1,23 +1,21 @@
 package org.games.xlspaceship.web.resources;
 
+import lombok.extern.slf4j.Slf4j;
 import org.games.xlspaceship.impl.model.FireRequest;
 import org.games.xlspaceship.impl.model.NewGameRequest;
 import org.games.xlspaceship.impl.model.NewGameResponse;
 import org.games.xlspaceship.impl.services.ValidationServices;
 import org.games.xlspaceship.impl.services.XLSpaceshipServices;
 import org.games.xlspaceship.impl.RestResources;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+@Slf4j
 @RestController
 @RequestMapping(value = RestResources.PROTOCOL_PATH)
 public class ProtocolResource {
-
-    private static final Logger log = LoggerFactory.getLogger(ProtocolResource.class);
 
     @Autowired
     private ValidationServices validationServices;
@@ -91,7 +89,7 @@ public class ProtocolResource {
     public ResponseEntity<?> shotByOpponent(
             @PathVariable("gameId") String gameId,
             @RequestBody FireRequest fireRequestByOpponent) {
-        ResponseEntity validResponse = validationServices.validateFireRequest(fireRequestByOpponent);
+        ResponseEntity<?> validResponse = validationServices.validateFireRequest(fireRequestByOpponent);
         if (validResponse != null) {
             return validResponse;
         }

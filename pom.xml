@@ -22,6 +22,8 @@
 <!--        <thymeleaf-layout-dialect.version>2.2.2</thymeleaf-layout-dialect.version>-->
 <!--        <spring-cloud.version>Dalston.SR1</spring-cloud.version>-->
 
+        <lombok.version>1.18.30</lombok.version>
+
         <junit5.version>5.10.1</junit5.version>
         <mockito.version>5.8.0</mockito.version>
     </properties>
@@ -75,6 +77,11 @@
             <version>${spring.boot}</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>${lombok.version}</version>
+        </dependency>
 <!--        <dependency>-->
 <!--            <groupId>org.springframework.cloud</groupId>-->
 <!--            <artifactId>spring-cloud-starter-sleuth</artifactId>-->

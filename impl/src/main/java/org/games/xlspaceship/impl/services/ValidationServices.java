@@ -1,15 +1,16 @@
 package org.games.xlspaceship.impl.services;
 
+import lombok.RequiredArgsConstructor;
 import org.games.xlspaceship.impl.game.GameStatus;
 import org.games.xlspaceship.impl.model.FireRequest;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import static org.games.xlspaceship.impl.RestResources.*;
+import static org.games.xlspaceship.impl.RestResources.jsonError;
 
 @Service
+@RequiredArgsConstructor
 public class ValidationServices {
 
     public static final String MORE_THEN_5 = "More then 5 shots!";
@@ -21,12 +22,7 @@ public class ValidationServices {
     private static final Object lockShotByOpponent = new Object();
     private static final Object lockShotByMyself = new Object();
 
-    @Autowired
-    private XLSpaceshipServices xl;
-
-    public void setXl(XLSpaceshipServices xl) {
-        this.xl = xl;
-    }
+    private final XLSpaceshipServices xl;
 
     public ResponseEntity<?> validateFireRequest(FireRequest fireRequest) {
         if (fireRequest.getSalvo().size() > 5) {

@@ -1,40 +1,30 @@
 package org.games.xlspaceship.impl.services;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import lombok.RequiredArgsConstructor;
 import org.games.xlspaceship.impl.game.GameStatus;
 import org.games.xlspaceship.impl.game.GameTurn;
 import org.games.xlspaceship.impl.game.Grid;
 import org.games.xlspaceship.impl.game.GridStatus;
-import org.games.xlspaceship.impl.model.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.games.xlspaceship.impl.model.FireRequest;
+import org.games.xlspaceship.impl.model.FireResponse;
+import org.games.xlspaceship.impl.model.NewGameRequest;
+import org.games.xlspaceship.impl.model.NewGameResponse;
 import org.springframework.stereotype.Service;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
 @Service
+@RequiredArgsConstructor
 public class XLSpaceshipServices {
-
-    private static final Logger log = LoggerFactory.getLogger(XLSpaceshipServices.class);
 
     private static final ConcurrentHashMap<String, GameStatus> games = new ConcurrentHashMap<>();
 
-    @Autowired
-    private UserServices userServices;
-
-    @Autowired
-    private GridServices gridServices;
-
-    @Autowired
-    private GameServices gameServices;
-
-    @Autowired
-    private RestServices restServices;
-
-    @Autowired
-    private AIServices aiServices;
+    private final UserServices userServices;
+    private final GridServices gridServices;
+    private final GameServices gameServices;
+    private final RestServices restServices;
+    private final AIServices aiServices;
 
     public NewGameResponse createRemoteGame(NewGameRequest newGameRequest) {
         String localUserId = newGameRequest.getUserId();

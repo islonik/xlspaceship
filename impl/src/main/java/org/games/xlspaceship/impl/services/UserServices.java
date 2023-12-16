@@ -1,37 +1,19 @@
 package org.games.xlspaceship.impl.services;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.Data;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+@Data
 @Service
+@RequiredArgsConstructor
 public class UserServices {
 
-    @Autowired
-    private RandomServices randomServices;
-
-    public void setRandomServices(RandomServices randomServices) {
-        this.randomServices = randomServices;
-    }
+    private final RandomServices randomServices;
 
     private String userId;
     private String fullName;
     private boolean isAI = false;
-
-    public String getUserId() {
-        return userId;
-    }
-
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
-
-    public String getFullName() {
-        return fullName;
-    }
-
-    public void setFullName(String fullName) {
-        this.fullName = fullName;
-    }
 
     public void setUpAI() {
         isAI = true;

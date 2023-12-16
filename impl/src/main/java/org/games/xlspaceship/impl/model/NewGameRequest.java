@@ -1,7 +1,11 @@
 package org.games.xlspaceship.impl.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Data;
+import lombok.ToString;
 
+@Data
+@ToString
 public class NewGameRequest {
 
     @JsonProperty("user_id")
@@ -13,36 +17,4 @@ public class NewGameRequest {
     @JsonProperty("spaceship_protocol")
     private SpaceshipProtocol spaceshipProtocol;
 
-    public String getUserId() {
-        return userId;
-    }
-
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
-
-    public String getFullName() {
-        return fullName;
-    }
-
-    public void setFullName(String fullName) {
-        this.fullName = fullName;
-    }
-
-    public SpaceshipProtocol getSpaceshipProtocol() {
-        return spaceshipProtocol;
-    }
-
-    public void setSpaceshipProtocol(SpaceshipProtocol spaceshipProtocol) {
-        this.spaceshipProtocol = spaceshipProtocol;
-    }
-
-    @Override
-    public String toString() {
-        return "NewGameRequest{" +
-                "userId='" + userId + '\'' +
-                ", fullName='" + fullName + '\'' +
-                ", spaceshipProtocol=" + spaceshipProtocol +
-                '}';
-    }
 }

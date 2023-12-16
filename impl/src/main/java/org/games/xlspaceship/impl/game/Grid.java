@@ -12,7 +12,7 @@ public class Grid {
     public static final String MISS = "miss";
 
     public static final int SIZE = 16;
-    private Cell[][] grid = new Cell[SIZE][SIZE];
+    private final Cell[][] grid = new Cell[SIZE][SIZE];
     private List<Spaceship> spaceshipList = new ArrayList<>();
 
     public Grid() {

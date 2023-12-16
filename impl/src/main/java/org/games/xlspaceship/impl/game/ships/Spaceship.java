@@ -23,6 +23,7 @@ public abstract class Spaceship {
             height = concreteHeight;
             ship = new Cell[concreteHeight][concreteWidth];
         } else {
+            // turn ship or change form
             width = concreteHeight;
             height = concreteWidth;
             ship = new Cell[concreteWidth][concreteHeight];
@@ -37,8 +38,8 @@ public abstract class Spaceship {
 
     public int getLives() {
         int count = 0;
-        for (int i = 0; i < cells.size(); i++) {
-            if (cells.get(i).getValue().equals("*")) {
+        for (Cell cell : cells) {
+            if (cell.getValue().equals("*")) {
                 count++;
             }
         }

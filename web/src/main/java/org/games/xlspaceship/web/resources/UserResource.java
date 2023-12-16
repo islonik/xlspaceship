@@ -1,5 +1,6 @@
 package org.games.xlspaceship.web.resources;
 
+import lombok.extern.slf4j.Slf4j;
 import org.games.xlspaceship.impl.model.FireRequest;
 import org.games.xlspaceship.impl.model.NewGameResponse;
 import org.games.xlspaceship.impl.model.SpaceshipProtocol;
@@ -7,8 +8,6 @@ import org.games.xlspaceship.impl.services.RestServices;
 import org.games.xlspaceship.impl.services.ValidationServices;
 import org.games.xlspaceship.impl.services.XLSpaceshipServices;
 import org.games.xlspaceship.impl.RestResources;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -18,11 +17,11 @@ import org.springframework.web.client.RestClientException;
 
 import java.net.ConnectException;
 
+@Slf4j
 @RestController
 @RequestMapping(value = RestResources.USER_PATH)
 public class UserResource {
 
-    private static final Logger log = LoggerFactory.getLogger(UserResource.class);
     private static final String CONNECTION_REFUSED = "Remote server not found by host('%s') and port('%s').";
 
     @Autowired
@@ -83,7 +82,7 @@ public class UserResource {
             consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_FORM_URLENCODED_VALUE}
     )
     public ResponseEntity<?> createNewGame(@RequestBody SpaceshipProtocol incomingSp) {
-        ResponseEntity validResponse = validationServices.validateRemotePort(incomingSp.getPort());
+        ResponseEntity<?> validResponse = validationServices.validateRemotePort(incomingSp.getPort());
         if (validResponse != null) {
             return validResponse;
         }
@@ -155,7 +154,7 @@ public class UserResource {
     public ResponseEntity<?> shotByMyself(
             @PathVariable("gameId") String gameId,
             @RequestBody FireRequest fireRequestByMyself) {
-        ResponseEntity validResponse = validationServices.validateFireRequest(fireRequestByMyself);
+        ResponseEntity<?> validResponse = validationServices.validateFireRequest(fireRequestByMyself);
         if (validResponse != null) {
             return validResponse;
         }

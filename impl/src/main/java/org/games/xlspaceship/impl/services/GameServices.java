@@ -1,21 +1,16 @@
 package org.games.xlspaceship.impl.services;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import java.util.concurrent.atomic.AtomicLong;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.concurrent.atomic.AtomicLong;
-
 @Service
+@RequiredArgsConstructor
 public class GameServices {
 
     private static final AtomicLong sequenceId = new AtomicLong();
 
-    @Autowired
-    private RandomServices randomServices;
-
-    public void setRandomServices(RandomServices randomServices) {
-        this.randomServices = randomServices;
-    }
+    private final RandomServices randomServices;
 
     public String nextUniqueGameId() {
         return String.format("match-%s-%s-%s",

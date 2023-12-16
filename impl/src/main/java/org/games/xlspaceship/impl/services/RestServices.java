@@ -1,21 +1,18 @@
 package org.games.xlspaceship.impl.services;
 
+import java.net.InetAddress;
+import java.util.Objects;
+import lombok.extern.slf4j.Slf4j;
 import org.games.xlspaceship.impl.model.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.core.env.Environment;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import java.net.InetAddress;
-
+@Slf4j
 @Service
 public class RestServices {
-
-    private static final Logger log = LoggerFactory.getLogger(XLSpaceshipServices.class);
 
     private static final String NEW_GAME_REQUEST = "http://%s:%s/xl-spaceship/protocol/game/new";
     private static final String FIRE_REQUEST = "http://%s:%s/xl-spaceship/protocol/game/%s";
@@ -23,11 +20,6 @@ public class RestServices {
     private final Environment environment;
     private final UserServices userServices;
     private final RestTemplate restTemplate;
-
-//    @Bean
-//    public RestTemplate getRestTemplate() {
-//        return new RestTemplate();
-//    }
 
     @Autowired
     public RestServices(Environment environment, UserServices userServices) {
@@ -37,7 +29,7 @@ public class RestServices {
     }
 
     public int getCurrentPort() {
-        return Integer.parseInt(environment.getProperty("server.port"));
+        return Integer.parseInt(Objects.requireNonNull(environment.getProperty("server.port")));
     }
 
     public String getCurrentHostname() {

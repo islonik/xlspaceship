@@ -1,8 +1,7 @@
 package org.games.xlspaceship.web;
 
+import lombok.extern.slf4j.Slf4j;
 import org.games.xlspaceship.impl.services.UserServices;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
@@ -14,6 +13,7 @@ import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfigurat
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 
+@Slf4j
 @SpringBootApplication
 @ComponentScan({"org.games.xlspaceship.impl", "org.games.xlspaceship.web"})
 @EnableAutoConfiguration(exclude = {
@@ -22,8 +22,6 @@ import org.springframework.context.annotation.EnableAspectJAutoProxy;
 })
 @EnableAspectJAutoProxy
 public class Application implements ApplicationRunner {
-
-    private static final Logger log = LoggerFactory.getLogger(Application.class);
 
     @Autowired
     private UserServices userServices;

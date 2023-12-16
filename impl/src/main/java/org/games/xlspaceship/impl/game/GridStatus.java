@@ -6,7 +6,9 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 import java.util.ArrayList;
 import java.util.List;
+import lombok.Data;
 
+@Data
 @JsonPropertyOrder({"user_id", "board"})
 public class GridStatus {
 
@@ -19,22 +21,6 @@ public class GridStatus {
     @JsonProperty("board")
     private List<String> board = new ArrayList<>();
 
-    public String getUserId() {
-        return userId;
-    }
-
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
-
-    public Grid getGrid() {
-        return grid;
-    }
-
-    public void setGrid(Grid grid) {
-        this.grid = grid;
-    }
-
     public List<String> getBoard() {
         if (grid != null) {
             board = grid.toList();
@@ -42,8 +28,5 @@ public class GridStatus {
         return board;
     }
 
-    public void setBoard(List<String> board) {
-        this.board = board;
-    }
 
 }

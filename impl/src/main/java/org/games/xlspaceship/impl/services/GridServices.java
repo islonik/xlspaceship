@@ -1,22 +1,17 @@
 package org.games.xlspaceship.impl.services;
 
-import org.games.xlspaceship.impl.game.*;
-import org.games.xlspaceship.impl.game.ships.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import java.util.ArrayList;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
+import org.games.xlspaceship.impl.game.Grid;
+import org.games.xlspaceship.impl.game.ships.*;
+import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class GridServices {
 
-    @Autowired
-    private RandomServices randomServices;
-
-    public void setRandomServices(RandomServices randomServices) {
-        this.randomServices = randomServices;
-    }
+    private final RandomServices randomServices;
 
     public Grid newUnknownGrid() {
         return new Grid();
