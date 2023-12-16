@@ -10,6 +10,79 @@ To be able to build this project you should have installed maven.
 To be able to run this project: you should launch run.sh and runAI.sh files (you can customize these files in advance).
 
 *******************************************
+### How to enable Swagger UI
+*******************************************
+
+#### 1. Add dependency
+```xml
+<dependency>
+    <groupId>org.springdoc</groupId>
+    <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+    <version>2.3.0</version>
+</dependency>
+```
+
+#### 2. Add @OpenAPIDefinition in Application file
+```java
+
+@OpenAPIDefinition(info = @Info(
+        title = "Battleship game",
+        version = "1.0",
+        description = "Swagger UI for Battleship online game"
+))
+public class Application implements ApplicationRunner {
+```
+
+#### 3. Put OpenAPI annotations
+##### 3.1 @Tag annotation
+
+```java
+@Tag(name = "User", description = "List of APIs for user actions")
+```
+
+so it might look like:
+
+```java
+@Slf4j
+@RestController
+@Tag(name = "User", description = "List of APIs for user actions")
+@RequestMapping(value = RestResources.USER_PATH)
+public class UserResource {
+```
+
+##### 3.2. @Operation annotation
+
+```java
+    @Operation(
+        summary = "Get status by gameId.",
+        description = "API to get status of the game."
+)
+```
+
+so it might look like:
+
+```java
+/*
+    GET http://localhost:8079/xl-spaceship/user/game/match-1
+*/
+@Operation(
+        summary = "Get status by gameId.",
+        description = "API to get status of the game."
+)
+@RequestMapping(
+        value = "/game/{gameId}",
+        method = RequestMethod.GET,
+        produces = MediaType.APPLICATION_JSON_VALUE
+)
+public ResponseEntity<?> getStatusByGameId(
+```
+
+#### 4. Open URL link
+```bash
+http://localhost:8079/swagger-ui/index.html
+```
+
+*******************************************
 ### How to enable pretty json output
 *******************************************
 <b>Attention!!!</b>

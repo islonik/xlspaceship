@@ -1,5 +1,8 @@
 package org.games.xlspaceship.web.resources;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.games.xlspaceship.impl.model.FireRequest;
 import org.games.xlspaceship.impl.model.NewGameResponse;
@@ -8,7 +11,6 @@ import org.games.xlspaceship.impl.services.RestServices;
 import org.games.xlspaceship.impl.services.ValidationServices;
 import org.games.xlspaceship.impl.services.XLSpaceshipServices;
 import org.games.xlspaceship.impl.RestResources;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -19,23 +21,24 @@ import java.net.ConnectException;
 
 @Slf4j
 @RestController
+@Tag(name = "User", description = "List of APIs for user actions")
 @RequestMapping(value = RestResources.USER_PATH)
+@RequiredArgsConstructor
 public class UserResource {
 
     private static final String CONNECTION_REFUSED = "Remote server not found by host('%s') and port('%s').";
 
-    @Autowired
-    private ValidationServices validationServices;
-
-    @Autowired
-    private RestServices restServices;
-
-    @Autowired
-    private XLSpaceshipServices xl;
+    private final ValidationServices validationServices;
+    private final RestServices restServices;
+    private final XLSpaceshipServices xl;
 
     /*
     GET http://localhost:8079/xl-spaceship/user/game/match-1
      */
+    @Operation(
+            summary = "Get status by gameId.",
+            description = "API to get status of the game."
+    )
     @RequestMapping(
             value = "/game/{gameId}",
             method = RequestMethod.GET,
@@ -75,6 +78,10 @@ public class UserResource {
     }
 
      */
+    @Operation(
+            summary = "Get create a new game.",
+            description = "API to get a status of the game."
+    )
     @RequestMapping(
             value = "/game/new",
             method = RequestMethod.POST,
@@ -145,6 +152,10 @@ public class UserResource {
     }
 
      */
+    @Operation(
+            summary = "Shoot a barrage by a human.",
+            description = "API to shoot a barrage by a human."
+    )
     @RequestMapping(
             value = "/game/{gameId}/fire",
             method = RequestMethod.PUT,

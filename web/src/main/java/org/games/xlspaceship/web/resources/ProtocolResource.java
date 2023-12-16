@@ -1,5 +1,8 @@
 package org.games.xlspaceship.web.resources;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.games.xlspaceship.impl.model.FireRequest;
 import org.games.xlspaceship.impl.model.NewGameRequest;
@@ -7,21 +10,19 @@ import org.games.xlspaceship.impl.model.NewGameResponse;
 import org.games.xlspaceship.impl.services.ValidationServices;
 import org.games.xlspaceship.impl.services.XLSpaceshipServices;
 import org.games.xlspaceship.impl.RestResources;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @RestController
+@Tag(name = "Protocol", description = "List of APIs for protocol actions")
 @RequestMapping(value = RestResources.PROTOCOL_PATH)
+@RequiredArgsConstructor
 public class ProtocolResource {
 
-    @Autowired
-    private ValidationServices validationServices;
-
-    @Autowired
-    private XLSpaceshipServices xlSpaceshipServices;
+    private final ValidationServices validationServices;
+    private final XLSpaceshipServices xlSpaceshipServices;
 
     /*
     Content-Type : application/json
@@ -45,6 +46,10 @@ public class ProtocolResource {
     }
 
      */
+    @Operation(
+            summary = "Create a new game",
+            description = "API to create a new game."
+    )
     @RequestMapping(
             value = "/game/new",
             method = RequestMethod.POST,
@@ -80,6 +85,10 @@ public class ProtocolResource {
     }
 
      */
+    @Operation(
+            summary = "Shoot a barrage.",
+            description = "API to shoot a barrage."
+    )
     @RequestMapping(
             value = "/game/{gameId}",
             method = RequestMethod.POST,

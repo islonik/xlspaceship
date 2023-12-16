@@ -1,5 +1,7 @@
 package org.games.xlspaceship.web;
 
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.info.Info;
 import lombok.extern.slf4j.Slf4j;
 import org.games.xlspaceship.impl.services.UserServices;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +23,11 @@ import org.springframework.context.annotation.EnableAspectJAutoProxy;
         HibernateJpaAutoConfiguration.class
 })
 @EnableAspectJAutoProxy
+@OpenAPIDefinition(info = @Info(
+        title = "Battleship game",
+        version = "1.0",
+        description = "Swagger UI for Battleship online game"
+))
 public class Application implements ApplicationRunner {
 
     @Autowired
