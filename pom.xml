@@ -16,12 +16,10 @@
     </modules>
 
     <properties>
-        <spring.boot>3.2.0</spring.boot>
-        <springdoc-openapi-starter-webmvc-ui.version>2.3.0</springdoc-openapi-starter-webmvc-ui.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-<!--        <thymeleaf.version>3.0.7.RELEASE</thymeleaf.version>-->
-<!--        <thymeleaf-layout-dialect.version>2.2.2</thymeleaf-layout-dialect.version>-->
-<!--        <spring-cloud.version>Dalston.SR1</spring-cloud.version>-->
+        <spring.boot>3.2.1</spring.boot>
+        <springdoc-openapi-starter-webmvc-ui.version>2.3.0</springdoc-openapi-starter-webmvc-ui.version>
 
         <lombok.version>1.18.30</lombok.version>
 
@@ -122,11 +120,10 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.11.0</version>
+                <version>3.12.1</version>
                 <configuration>
-                    <release>17</release>
+                    <release>21</release>
                     <showWarnings>true</showWarnings>
-                    <encoding>UTF-8</encoding>
                     <showDeprecation>true</showDeprecation>
                     <maxmem>512m</maxmem>
                 </configuration>
