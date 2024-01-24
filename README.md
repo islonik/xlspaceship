@@ -9,6 +9,24 @@ To be able to build this project you should have installed maven.
 
 To be able to run this project: you should launch run.sh and runAI.sh files (you can customize these files in advance).
 
+## Dependency management
+
+### Overview of dependencies
+
+```bash
+mvn dependency:tree
+```
+
+### To find unused dependencies
+```bash
+mvn dependency:analyze
+```
+
+### To check new dependencies
+```bash
+mvn versions:display-dependency-updates
+```
+
 *******************************************
 ### How to enable Swagger UI
 *******************************************
