@@ -1,7 +1,8 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
 <head>
     <title>XL Spaceship: Current game.</title>
+    <link rel="stylesheet" href="../../css/game.css">
     <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
     <script type="text/javascript">
         jQuery(document).ready(function ($) {
@@ -25,7 +26,7 @@
 
             var imgId = el.id;
             $('#' + imgId).removeAttr('onclick');
-            $('#' + imgId).attr('src', "../../im/shot.png");
+            $('#' + imgId).attr('class', "shot");
 
             // add salvo
             var salvo = $('#salvo').val();

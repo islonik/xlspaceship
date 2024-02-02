@@ -99,11 +99,9 @@ public class MVCController {
                 String y16 = Integer.toString(y, 16);
                 String idValue = String.format("%sx%s", x16, y16);
                 String value = Character.toString(ch);
-                html.append(String.format("<td shot=\"%s\">", idValue));
 
-                pictureName(html, idValue, value, isWon);
+                square(html, idValue, value, isWon);
 
-                html.append("</td>");
                 x++;
             }
             html.append("</tr>");
@@ -127,25 +125,25 @@ public class MVCController {
         html.append(String.format("<img src=\"../../im/%s\"/>", temp));
     }
 
-    private void pictureName(StringBuilder html, String idValue, String value, boolean isWon) {
+    private void square(StringBuilder html, String idValue, String value, boolean isWon) {
         boolean isClickable = false;
         String temp;
         if (value.equalsIgnoreCase("*")) {
-            temp = "ship.png";
+            temp = "ship";
         } else if (value.equalsIgnoreCase("x")) {
-            temp = "sunk.png";
+            temp = "sunk";
         } else if (value.equalsIgnoreCase("-")) {
-            temp = "shot.png";
+            temp = "shot";
         } else {
-            temp = "empty.png";
+            temp = "empty";
             if (!isWon) {
                 isClickable = true;
             }
         }
         if (isClickable) {
-            html.append(String.format("<img id=\"%s\" src=\"../../im/%s\" onclick='addShot(this);' />", idValue, temp));
+            html.append(String.format("<td id=\"%s\" shot=\"%s\" onclick=\"addShot(this);\" class=\"%s\"/>", idValue, idValue, temp));
         } else {
-            html.append(String.format("<img id=\"%s\" src=\"../../im/%s\" />", idValue, temp));
+            html.append(String.format("<td id=\"%s\" shot=\"%s\" class=\"%s\"/>", idValue, idValue, temp));
         }
     }
 
