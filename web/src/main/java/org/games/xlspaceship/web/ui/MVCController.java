@@ -39,10 +39,10 @@ public class MVCController {
 
         GameTurn gameTurn = gameStatus.getGameTurn();
 
-        boolean isWon = false;
+        boolean isClickable = true;
         String attrName  = (gameTurn.getPlayerTurn() != null) ? "playerTurn" : "won";
         if (attrName.equalsIgnoreCase("won")) {
-            isWon = true;
+            isClickable = false;
         }
         String attrValue = (gameTurn.getPlayerTurn() != null) ? gameTurn.getPlayerTurn() : gameTurn.getWon();
         return new ModelAndView(
@@ -52,40 +52,12 @@ public class MVCController {
         ).addObject(attrName, attrValue
         ).addObject("gameId", gameId
         ).addObject("aliveShips", gameStatus.getAliveShips()
-        ).addObject("myGrid", myGridTable(gameStatus.getSelf())
-        ).addObject("opponentGrid", opponentGridTable(gameStatus.getOpponent(), isWon)
+        ).addObject("myGrid", gridTable(gameStatus.getSelf(), false)
+        ).addObject("opponentGrid", gridTable(gameStatus.getOpponent(), isClickable)
         );
     }
 
-    private String myGridTable(GridStatus gridStatus) {
-        StringBuilder html = new StringBuilder();
-        List<String> rows = gridStatus.getBoard();
-        int y = 0;
-        html.append("<table>");
-        for (String row : rows) {
-            html.append("<tr class=\"row\">");
-            char[] chars = row.toCharArray();
-            int x = 0;
-            for (Character ch : chars) {
-                String x16 = Integer.toString(x, 16);
-                String y16 = Integer.toString(y, 16);
-                String idValue = String.format("%sx%s", x16, y16);
-                String value = Character.toString(ch);
-                html.append(String.format("<td shot=\"%s\">", idValue));
-
-                pictureName(html, value);
-
-                html.append("</td>");
-                x++;
-            }
-            html.append("</tr>");
-            y++;
-        }
-        html.append("</table>");
-        return html.toString();
-    }
-
-    private String opponentGridTable(GridStatus gridStatus, boolean isWon) {
+    private String gridTable(GridStatus gridStatus, boolean isClickable) {
         StringBuilder html = new StringBuilder();
         List<String> rows = gridStatus.getBoard();
         html.append("<table>");
@@ -100,7 +72,7 @@ public class MVCController {
                 String idValue = String.format("%sx%s", x16, y16);
                 String value = Character.toString(ch);
 
-                square(html, idValue, value, isWon);
+                square(html, idValue, value, isClickable);
 
                 x++;
             }
@@ -111,22 +83,7 @@ public class MVCController {
         return html.toString();
     }
 
-    private void pictureName(StringBuilder html, String value) {
-        String temp;
-        if (value.equalsIgnoreCase("*")) {
-            temp = "ship.png";
-        } else if (value.equalsIgnoreCase("x")) {
-            temp = "sunk.png";
-        } else if (value.equalsIgnoreCase("-")) {
-            temp = "shot.png";
-        } else {
-            temp = "empty.png";
-        }
-        html.append(String.format("<img src=\"../../im/%s\"/>", temp));
-    }
-
-    private void square(StringBuilder html, String idValue, String value, boolean isWon) {
-        boolean isClickable = false;
+    private void square(StringBuilder html, String idValue, String value, boolean isClickable) {
         String temp;
         if (value.equalsIgnoreCase("*")) {
             temp = "ship";
@@ -136,14 +93,11 @@ public class MVCController {
             temp = "shot";
         } else {
             temp = "empty";
-            if (!isWon) {
-                isClickable = true;
-            }
         }
         if (isClickable) {
             html.append(String.format("<td id=\"%s\" shot=\"%s\" onclick=\"addShot(this);\" class=\"%s\"/>", idValue, idValue, temp));
         } else {
-            html.append(String.format("<td id=\"%s\" shot=\"%s\" class=\"%s\"/>", idValue, idValue, temp));
+            html.append(String.format("<td class=\"%s\"/>", temp));
         }
     }
 
