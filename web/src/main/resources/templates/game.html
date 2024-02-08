@@ -22,50 +22,55 @@
         });
 
         function addShot(el) {
-            var aliveShips = $('#aliveShips').val();
+            var userId = $('#userId').val();
+            var playerTurn = $('#playerTurn').val();
 
-            var imgId = el.id;
-            $('#' + imgId).removeAttr('onclick');
-            $('#' + imgId).attr('class', "shot");
+            if (userId == playerTurn) { // ignore mouse clicks while it's not your turn
+                var aliveShips = $('#aliveShips').val();
 
-            // add salvo
-            var salvo = $('#salvo').val();
-            salvo = salvo + imgId;
+                var imgId = el.id;
+                $('#' + imgId).removeAttr('onclick');
+                $('#' + imgId).attr('class', "shot");
 
-            // salvo count
-            var salvoCount = parseInt($('#salvoCount').val());
-            salvoCount = salvoCount + 1;
-            $('#salvoCount').val(salvoCount);
+                // add salvo
+                var salvo = $('#salvo').val();
+                salvo = salvo + imgId;
 
-            if (salvoCount >= aliveShips) {
-                var gameId = $('#gameId').val();
-                var array = new Array();
-                array = salvo.split(",");
+                // salvo count
+                var salvoCount = parseInt($('#salvoCount').val());
+                salvoCount = salvoCount + 1;
+                $('#salvoCount').val(salvoCount);
 
-                var fireRequest = {}
-                fireRequest["salvo"] = array;
+                if (salvoCount >= aliveShips) {
+                    var gameId = $('#gameId').val();
+                    var array = new Array();
+                    array = salvo.split(",");
 
-                $.ajax({
-                    type: "PUT",
-                    contentType: "application/json",
-                    url: "/xl-spaceship/user/game/" + gameId + "/fire",
-                    data: JSON.stringify(fireRequest),
-                    dataType: 'json',
-                    timeout: 5000,
-                    success: function (data) {
-                        window.location.href = "/gameId/" + gameId;
-                    },
-                    error: function (data, status, error) {
-                        var jsonError = jQuery.parseJSON(data.responseText);
-                        alert(jsonError.error_message); // very crude approach
-                        window.location.href = "/gameId/" + gameId;
-                    }
-                });
+                    var fireRequest = {}
+                    fireRequest["salvo"] = array;
 
-            } else {
-                salvo = salvo + ",";
+                    $.ajax({
+                        type: "PUT",
+                        contentType: "application/json",
+                        url: "/xl-spaceship/user/game/" + gameId + "/fire",
+                        data: JSON.stringify(fireRequest),
+                        dataType: 'json',
+                        timeout: 5000,
+                        success: function (data) {
+                            window.location.href = "/gameId/" + gameId;
+                        },
+                        error: function (data, status, error) {
+                            var jsonError = jQuery.parseJSON(data.responseText);
+                            alert(jsonError.error_message); // very crude approach
+                            window.location.href = "/gameId/" + gameId;
+                        }
+                    });
+
+                } else {
+                    salvo = salvo + ",";
+                }
+                $('#salvo').val(salvo);
             }
-            $('#salvo').val(salvo);
         }
     </script>
 </head>
