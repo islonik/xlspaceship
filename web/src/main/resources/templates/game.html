@@ -1,149 +1,165 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="en">
-<head>
-    <title>XL Spaceship: Current game.</title>
-    <link rel="stylesheet" href="../../css/game.css">
-    <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
-    <script type="text/javascript">
-        jQuery(document).ready(function ($) {
-            var myselfId = $('#userId').val();
-            var playerTurnId = $('#playerTurn').val();
-            var opponentId = $('#opponentId').val();
-            var wonId = $('#won').val();
-            var gameId = $('#gameId').val();
+    <head>
+        <title>XL Spaceship: Current game.</title>
+        <link rel="stylesheet" href="../../css/game.css">
+        <script type="text/javascript">
+            // we wait till page is loaded
+            document.addEventListener("DOMContentLoaded", (event) => {
+                updatePageAfterPlayerTurn();
+            });
 
-            if (myselfId === wonId) {
-                alert("You won!");
-            } else if (opponentId === wonId) {
-                alert("You lose!");
-            } else if (playerTurnId === 'AI') {
-                window.location.href = "/gameId/" + gameId;
+            function updatePageAfterPlayerTurn() {
+                var userId = document.getElementById("userId").value;
+                var playerTurnId = document.getElementById("playerTurnId").value;
+                var opponentId = document.getElementById("opponentId").value;
+                var wonId = document.getElementById("wonId").value;
+                var gameId = document.getElementById("gameId").value;
+
+                if (userId === wonId) {
+                    alert("You won!");
+                } else if (opponentId === wonId) {
+                    alert("You lost!");
+                } else if (playerTurnId === 'AI') {
+                    window.location.href = "/gameId/" + gameId;
+                }
             }
-        });
 
-        function addShot(el) {
-            var userId = $('#userId').val();
-            var playerTurn = $('#playerTurn').val();
+            function addShot(event) {
+                var userId = document.getElementById("userId").value;
+                var playerTurnId = document.getElementById("playerTurnId").value;
 
-            if (userId == playerTurn) { // ignore mouse clicks while it's not your turn
-                var aliveShips = $('#aliveShips').val();
+                if (userId == playerTurnId) { // ignore mouse clicks while it's not your turn
+                    var aliveShips = document.getElementById("aliveShips").value;
 
-                var imgId = el.id;
-                $('#' + imgId).removeAttr('onclick');
-                $('#' + imgId).attr('class', "shot");
+                    var imgId = event.id;
 
-                // add salvo
-                var salvo = $('#salvo').val();
-                salvo = salvo + imgId;
+                    document.getElementById(imgId).removeAttribute("onclick");
+                    document.getElementById(imgId).setAttribute("class", "shot");
 
-                // salvo count
-                var salvoCount = parseInt($('#salvoCount').val());
-                salvoCount = salvoCount + 1;
-                $('#salvoCount').val(salvoCount);
+                    // get salvo
+                    var salvo = document.getElementById("salvo").value;
+                    salvo = salvo + imgId;
 
-                if (salvoCount >= aliveShips) {
-                    var gameId = $('#gameId').val();
-                    var array = new Array();
-                    array = salvo.split(",");
+                    // get salvoCount
+                    var salvoCount = parseInt(document.getElementById("salvoCount").value);
+                    // update salvoCount
+                    salvoCount = salvoCount + 1;
+                    // save salvoCount
+                    document.getElementById("salvoCount").value = salvoCount;
 
-                    var fireRequest = {}
-                    fireRequest["salvo"] = array;
+                    if (salvoCount >= aliveShips) {
+                        // send required salvo to backend
+                        sendAjaxRequest(salvo);
+                    } else {
+                        // update salve
+                        salvo = salvo + ",";
+                    }
+                    // save salvo
+                    document.getElementById("salvo").value = salvo;
+                }
+            }
 
-                    $.ajax({
-                        type: "PUT",
-                        contentType: "application/json",
-                        url: "/xl-spaceship/user/game/" + gameId + "/fire",
-                        data: JSON.stringify(fireRequest),
-                        dataType: 'json',
-                        timeout: 5000,
-                        success: function (data) {
+            function sendAjaxRequest(salvo) {
+                var gameId = document.getElementById("gameId").value;
+
+                var array = new Array();
+                array = salvo.split(",");
+
+                var fireRequest = {}
+                fireRequest["salvo"] = array;
+
+                var httpRequest = new XMLHttpRequest();
+
+                httpRequest.onreadystatechange = function() {
+                    if (httpRequest.readyState == XMLHttpRequest.DONE) { // XMLHttpRequest.DONE == 4
+                        if (httpRequest.status == 200) {
+                            var id = JSON.parse(httpRequest.responseText).game_id;
                             window.location.href = "/gameId/" + gameId;
-                        },
-                        error: function (data, status, error) {
-                            var jsonError = jQuery.parseJSON(data.responseText);
+                        } else {
+                            var jsonError = JSON.parse(httpRequest.responseText);
                             alert(jsonError.error_message); // very crude approach
                             window.location.href = "/gameId/" + gameId;
                         }
-                    });
+                    }
+                };
 
-                } else {
-                    salvo = salvo + ",";
-                }
-                $('#salvo').val(salvo);
+                httpRequest.open("PUT", "/xl-spaceship/user/game/" + gameId + "/fire", true);
+                httpRequest.setRequestHeader('Content-Type', 'application/json; charset=utf-8');
+                httpRequest.send(JSON.stringify(fireRequest));
             }
-        }
-    </script>
-</head>
-<body>
-<div>
-    <h1>XL Spaceship: Current game.</h1>
-    <br/>
-    <div>
-        <input id="salvoCount" type="hidden" value="0" readonly="readonly"/>
-        <input id="gameId" type="hidden" th:value="${gameId}" readonly="readonly"/>
+        </script>
+    </head>
+    <body>
+        <div>
+            <h1>XL Spaceship: Current game.</h1>
+            <br/>
+            <div>
+                <input id="salvoCount" type="hidden" value="0" readonly="readonly"/>
+                <input id="gameId" type="hidden" th:value="${gameId}" readonly="readonly"/>
 
-        <table>
-            <tr>
-                <td>Myself</td>
-                <td><input type="text" th:id="userId" th:name="${gameStatus.self.userId}"
-                           th:value="${gameStatus.self.userId}"
-                           readonly="readonly" disabled="disabled"/>
-                </td>
-            </tr>
-            <tr>
-                <td>Opponent</td>
-                <td><input type="text" th:id="opponentId" th:name="${gameStatus.opponent.userId}"
-                           th:value="${gameStatus.opponent.userId}"
-                           readonly="readonly" disabled="disabled"/>
-                </td>
-            </tr>
-            <tr>
-                <td>Turn</td>
-                <td>
-                    <input type="text" th:id="playerTurn" th:value="${playerTurn}" readonly="readonly"
-                           disabled="disabled"/>
-                </td>
-            </tr>
-            <tr>
-                <td>Won</td>
-                <td>
-                    <input type="text" th:id="won" th:value="${won}" readonly="readonly" disabled="disabled"/>
-                </td>
-            </tr>
-            <tr>
-                <td>Salvo</td>
-                <td>
-                    <input id="salvo" type="text" value="" readonly="readonly" disabled="disabled"/>
-                </td>
-            </tr>
-            <tr>
-                <td>Alive ships</td>
-                <td>
-                    <input id="aliveShips" type="text" th:value="${aliveShips}" readonly="readonly"
-                           disabled="disabled"/>
-                </td>
-            </tr>
-        </table>
-    </div>
-    <div>
-        <table>
-            <tr row="class">
-                <td>
-                    <form id="myGrid" th:inline="html">
-                        [(${myGrid})]
-                    </form>
-                </td>
-                <td>
-                    &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
-                </td>
-                <td>
-                    <form id="opponentGrid" th:inline="html">
-                        [(${opponentGrid})]
-                    </form>
-                </td>
-            </tr>
-        </table>
-    </div>
-</div>
-</body>
+                <table>
+                    <tr>
+                        <td>Myself</td>
+                        <td><input type="text" th:id="userId" th:name="${gameStatus.self.userId}"
+                                   th:value="${gameStatus.self.userId}"
+                                   readonly="readonly" disabled="disabled"/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Opponent</td>
+                        <td><input type="text" th:id="opponentId" th:name="${gameStatus.opponent.userId}"
+                                   th:value="${gameStatus.opponent.userId}"
+                                   readonly="readonly" disabled="disabled"/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Turn</td>
+                        <td>
+                            <input type="text" th:id="playerTurnId" th:value="${playerTurn}" readonly="readonly"
+                                   disabled="disabled"/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Won</td>
+                        <td>
+                            <input type="text" th:id="wonId" th:value="${won}" readonly="readonly" disabled="disabled"/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Salvo</td>
+                        <td>
+                            <input id="salvo" type="text" value="" readonly="readonly" disabled="disabled"/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Alive ships</td>
+                        <td>
+                            <input id="aliveShips" type="text" th:value="${aliveShips}" readonly="readonly"
+                                   disabled="disabled"/>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <div>
+                <table>
+                    <tr row="class">
+                        <td>
+                            <form id="myGrid" th:inline="html">
+                                [(${myGrid})]
+                            </form>
+                        </td>
+                        <td>
+                            &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+                        </td>
+                        <td>
+                            <form id="opponentGrid" th:inline="html">
+                                [(${opponentGrid})]
+                            </form>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </body>
 </html>
