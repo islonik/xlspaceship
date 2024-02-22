@@ -18,7 +18,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <spring.boot>3.2.2</spring.boot>
+        <spring.boot>3.2.3</spring.boot>
         <springdoc-openapi-starter-webmvc-ui.version>2.3.0</springdoc-openapi-starter-webmvc-ui.version>
 
         <lombok.version>1.18.30</lombok.version>
