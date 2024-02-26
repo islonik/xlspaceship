@@ -9,6 +9,10 @@ To be able to build this project you should have installed maven.
 
 To be able to run this project: you should launch run.sh and runAI.sh files (you can customize these files in advance).
 
+## Design
+
+![plot](./docs/sequence.png)
+
 ## Dependency management
 
 ### Overview of dependencies

@@ -4,9 +4,12 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.games.xlspaceship.impl.game.GameStatus;
 import org.games.xlspaceship.impl.model.FireRequest;
+import org.games.xlspaceship.impl.model.GameStatusOutput;
 import org.games.xlspaceship.impl.model.NewGameResponse;
 import org.games.xlspaceship.impl.model.SpaceshipProtocol;
+import org.games.xlspaceship.impl.services.GridServices;
 import org.games.xlspaceship.impl.services.RestServices;
 import org.games.xlspaceship.impl.services.ValidationServices;
 import org.games.xlspaceship.impl.services.XLSpaceshipServices;
@@ -31,6 +34,7 @@ public class UserResource {
     private final ValidationServices validationServices;
     private final RestServices restServices;
     private final XLSpaceshipServices xl;
+    private final GridServices gridServices;
 
     /*
     GET http://localhost:8079/xl-spaceship/user/game/match-1
@@ -132,6 +136,73 @@ public class UserResource {
     /*
     Content-Type : application/json
 
+    GET http://localhost:8079/xl-spaceship/user/game/{gameId}/new
+
+    Json response:
+    {
+        "user_id": "AI",
+        "full_name": "AI-72",
+        "game_id": "match-1",
+        "starting": "nikilipa"
+    }
+
+     */
+    @Operation(
+            summary = "Create a new game based on the previous input.",
+            description = "API to create a new game without providing host and port."
+    )
+    @RequestMapping(
+            value = "/game/{gameId}/new",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE,
+            consumes = MediaType.APPLICATION_JSON_VALUE
+    )
+    public ResponseEntity<?> createNewGame(
+            @PathVariable("gameId") String gameId) {
+
+        GameStatus gameStatus = validationServices.getStatusByGameId(gameId);
+
+        String removeHost = gameStatus.getHost();
+        int removePort = gameStatus.getPort();
+
+        SpaceshipProtocol outgoingSp = new SpaceshipProtocol();
+        outgoingSp.setHostname(restServices.getCurrentHostname());
+        outgoingSp.setPort(Integer.toString(restServices.getCurrentPort()));
+
+        log.info("remoteHost = " + removeHost + " remotePort = " + removePort + " restServiceHost = " + restServices.getCurrentHostname() + " restServicePort = " + restServices.getCurrentPort());
+
+        NewGameResponse newGameResponse = null;
+        try {
+            newGameResponse = restServices.sendPostNewGameRequest(removeHost, removePort, outgoingSp);
+        } catch (RestClientException rce) {
+            log.warn(rce.getMessage());
+            if (rce.getCause() instanceof ConnectException) {
+                return RestResources.jsonError(
+                        String.format(CONNECTION_REFUSED, removeHost, removePort),
+                        HttpStatus.BAD_REQUEST
+                );
+            } else {
+                return RestResources.jsonError(
+                        rce.getMessage(),
+                        HttpStatus.BAD_REQUEST
+                );
+            }
+        }
+
+        String uniqueGameId = newGameResponse.getGameId();
+
+        xl.createLocalGame(removeHost, removePort, uniqueGameId, newGameResponse);
+
+        return new ResponseEntity<Object>(
+                newGameResponse,
+                HttpStatus.OK
+        );
+    }
+
+
+    /*
+    Content-Type : application/json
+
     POST http://localhost:8079/xl-spaceship/user/game/{gameId}
     {
         "salvo" : ["0x0", "8x4", "DxA", "AxA", "7xF"]
@@ -172,4 +243,48 @@ public class UserResource {
 
         return validationServices.shotByMyself(gameId, fireRequestByMyself);
     }
+
+    /*
+    Content-Type : application/json
+
+    POST http://localhost:8079/xl-spaceship/user/game/{gameId}/status
+    {
+        "salvo" : ["0x0", "8x4", "DxA", "AxA", "7xF"]
+    }
+
+    Json response:
+    {
+        "grid": "<table><tr class=\"row\"><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/></tr><tr class=\"row\"><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/></tr><tr class=\"row\"><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"ship\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"shot\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/></tr><tr class=\"row\"><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"ship\"/><td class=\"empty\"/><td class=\"ship\"/><td class=\"empty\"/><td class=\"ship\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/></tr><tr class=\"row\"><td class=\"empty\"/><td class=\"shot\"/><td class=\"empty\"/><td class=\"ship\"/><td class=\"empty\"/><td class=\"ship\"/><td class=\"empty\"/><td class=\"ship\"/><td class=\"empty\"/><td class=\"ship\"/><td class=\"ship\"/><td class=\"ship\"/><td class=\"ship\"/><td class=\"ship\"/><td class=\"empty\"/><td class=\"empty\"/></tr><tr class=\"row\"><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"ship\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"ship\"/><td class=\"empty\"/><td class=\"sunk\"/><td class=\"empty\"/><td class=\"ship\"/><td class=\"empty\"/><td class=\"empty\"/></tr><tr class=\"row\"><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"ship\"/><td class=\"empty\"/><td class=\"ship\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/></tr><tr class=\"row\"><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/></tr><tr class=\"row\"><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"shot\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/></tr><tr class=\"row\"><td class=\"ship\"/><td class=\"ship\"/><td class=\"ship\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/></tr><tr class=\"row\"><td class=\"empty\"/><td class=\"ship\"/><td class=\"empty\"/><td class=\"ship\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"ship\"/><td class=\"empty\"/><td class=\"ship\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/></tr><tr class=\"row\"><td class=\"ship\"/><td class=\"ship\"/><td class=\"ship\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"ship\"/><td class=\"empty\"/><td class=\"ship\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/></tr><tr class=\"row\"><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"ship\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"ship\"/><td class=\"ship\"/><td class=\"ship\"/><td class=\"ship\"/><td class=\"empty\"/><td class=\"empty\"/></tr><tr class=\"row\"><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"ship\"/><td class=\"empty\"/><td class=\"ship\"/><td class=\"empty\"/><td class=\"ship\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/></tr><tr class=\"row\"><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"ship\"/><td class=\"empty\"/><td class=\"ship\"/><td class=\"empty\"/><td class=\"ship\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/></tr><tr class=\"row\"><td class=\"shot\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/><td class=\"empty\"/></tr></table>",
+        "game": {
+            "player_turn": "nikilipa"
+        },
+        "aliveShips": 5
+    }
+
+     */
+    @Operation(
+            summary = "Get my game status.",
+            description = "API to get the latest grid for the player and turn."
+    )
+    @RequestMapping(
+            value = "/game/{gameId}/status",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE,
+            consumes = MediaType.APPLICATION_JSON_VALUE
+    )
+    public ResponseEntity<?> gameStatus(
+            @PathVariable("gameId") String gameId) {
+        GameStatus gameStatus = validationServices.getStatusByGameId(gameId);
+
+        GameStatusOutput output = new GameStatusOutput();
+        output.setGrid(gridServices.getGridInHtml(gameStatus.getSelf(), false));
+        output.setGame(gameStatus.getGameTurn());
+        output.setAliveShips(gameStatus.getAliveShips());
+
+        return new ResponseEntity<Object>(
+                output,
+                HttpStatus.OK
+        );
+    }
+
 }

@@ -24,8 +24,8 @@ public class AIServices {
     public void asyncFireRequest(final String playerTurn, final String gameId, final int aliveShips, final GridStatus opponent) {
         if (userServices.isAI() && userServices.getUserId().equalsIgnoreCase(playerTurn) && aliveShips > 0) {
             executors.execute(() -> {
-                try {
-                    Thread.sleep(500L);
+//                try {
+                    //Thread.sleep(500L);
 
                     FireRequest fireRequest = new FireRequest();
                     fireRequest.setSalvo(addSalvo(opponent, aliveShips));
@@ -36,9 +36,9 @@ public class AIServices {
                     log.debug("host = {} port = {} gameId = {} aliveShips = {} request = {}", localHost, localPort, gameId, aliveShips, fireRequest);
 
                     restServices.fireShotByAi(localHost, localPort, gameId, fireRequest);
-                } catch (InterruptedException ie) {
-                    log.error(ie.getMessage());
-                }
+//                } catch (InterruptedException ie) {
+//                    log.error(ie.getMessage());
+//                }
             });
         }
     }

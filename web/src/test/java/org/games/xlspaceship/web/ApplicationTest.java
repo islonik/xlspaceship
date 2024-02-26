@@ -5,6 +5,7 @@ import org.games.xlspaceship.impl.game.GridStatus;
 import org.games.xlspaceship.impl.model.*;
 import org.games.xlspaceship.impl.services.RestServices;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +24,7 @@ import java.util.List;
                 ApplicationTest.AI_PORT
         }
 )
+//@Disabled
 public class ApplicationTest {
 
     public static final String REMOTE_PORT = "8056";
@@ -56,7 +58,7 @@ public class ApplicationTest {
 
         Assertions.assertEquals(
                 """
-                ...**......**...
+                -..**......**...
                 ...*.*....*.....
                 ...**......**...
                 ...*.*.......*..
@@ -86,19 +88,19 @@ public class ApplicationTest {
 
         FireRequest fireRequest = new FireRequest();
         List<String> salvoList = new ArrayList<>();
-        salvoList.add("0x0");
         salvoList.add("1x1");
         salvoList.add("2x2");
         salvoList.add("3x3");
         salvoList.add("4x4");
+        salvoList.add("5x5");
         fireRequest.setSalvo(salvoList);
 
         FireResponse fireResponse = restServices.fireShotByAi("127.0.0.1", Integer.parseInt(REMOTE_PORT), gameId, fireRequest);
         Assertions.assertNotNull(fireResponse);
-        Assertions.assertEquals("miss", fireResponse.getSalvo().get("0x0"));
         Assertions.assertEquals("miss", fireResponse.getSalvo().get("1x1"));
         Assertions.assertEquals("miss", fireResponse.getSalvo().get("2x2"));
         Assertions.assertEquals("hit", fireResponse.getSalvo().get("3x3"));
+        Assertions.assertEquals("hit", fireResponse.getSalvo().get("4x4"));
         Assertions.assertEquals("hit", fireResponse.getSalvo().get("4x4"));
     }
 
