@@ -101,36 +101,7 @@ public class UserResource {
         String removeHost = incomingSp.getHostname();
         int removePort = Integer.parseInt(incomingSp.getPort());
 
-        SpaceshipProtocol outgoingSp = new SpaceshipProtocol();
-        outgoingSp.setHostname(restServices.getCurrentHostname());
-        outgoingSp.setPort(Integer.toString(restServices.getCurrentPort()));
-
-        NewGameResponse newGameResponse = null;
-        try {
-            newGameResponse = restServices.sendPostNewGameRequest(removeHost, removePort, outgoingSp);
-        } catch (RestClientException rce) {
-            log.warn(rce.getMessage());
-            if (rce.getCause() instanceof ConnectException) {
-                return RestResources.jsonError(
-                        String.format(CONNECTION_REFUSED, removeHost, removePort),
-                        HttpStatus.BAD_REQUEST
-                );
-            } else {
-                return RestResources.jsonError(
-                        rce.getMessage(),
-                        HttpStatus.BAD_REQUEST
-                );
-            }
-        }
-
-        String uniqueGameId = newGameResponse.getGameId();
-
-        xl.createLocalGame(removeHost, removePort, uniqueGameId, newGameResponse);
-
-        return new ResponseEntity<Object>(
-                newGameResponse,
-                HttpStatus.OK
-        );
+        return createNewGame(removeHost, removePort);
     }
 
     /*
@@ -159,17 +130,22 @@ public class UserResource {
     )
     public ResponseEntity<?> createNewGame(
             @PathVariable("gameId") String gameId) {
-
         GameStatus gameStatus = validationServices.getStatusByGameId(gameId);
 
         String removeHost = gameStatus.getHost();
         int removePort = gameStatus.getPort();
 
+        return createNewGame(removeHost, removePort);
+    }
+
+    private ResponseEntity<?> createNewGame(String removeHost, int removePort) {
         SpaceshipProtocol outgoingSp = new SpaceshipProtocol();
         outgoingSp.setHostname(restServices.getCurrentHostname());
         outgoingSp.setPort(Integer.toString(restServices.getCurrentPort()));
 
-        log.info("remoteHost = " + removeHost + " remotePort = " + removePort + " restServiceHost = " + restServices.getCurrentHostname() + " restServicePort = " + restServices.getCurrentPort());
+        log.info("remoteHost = {} remotePort = {} restServiceHost = {} restServicePort = {}",
+                removeHost, removePort, restServices.getCurrentHostname(), restServices.getCurrentPort()
+        );
 
         NewGameResponse newGameResponse = null;
         try {
