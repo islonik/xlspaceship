@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import lombok.Data;
 
+// This class is used in MVCController, UserResource & business logic.
 @Data
 @JsonPropertyOrder({"self", "opponent", "game"})
 public class GameStatus {

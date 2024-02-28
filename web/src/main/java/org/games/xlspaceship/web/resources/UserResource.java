@@ -38,6 +38,8 @@ public class UserResource {
 
     /*
     GET http://localhost:8079/xl-spaceship/user/game/match-1
+
+    @return GameStatus
      */
     @Operation(
             summary = "Get status by gameId.",
