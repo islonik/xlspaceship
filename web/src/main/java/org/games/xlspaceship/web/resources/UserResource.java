@@ -22,6 +22,8 @@ import org.springframework.web.client.RestClientException;
 
 import java.net.ConnectException;
 
+import static org.games.xlspaceship.impl.RestResources.jsonError;
+
 @Slf4j
 @RestController
 @Tag(name = "User", description = "List of APIs for user actions")
@@ -211,7 +213,7 @@ public class UserResource {
             produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.APPLICATION_JSON_VALUE
     )
-    public ResponseEntity<?> shotByMyself(
+    public ResponseEntity<?> fireRequest(
             @PathVariable("gameId") String gameId,
             @RequestBody FireRequest fireRequestByMyself) {
         ResponseEntity<?> validResponse = validationServices.validateFireRequest(fireRequestByMyself);
@@ -250,8 +252,16 @@ public class UserResource {
             produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.APPLICATION_JSON_VALUE
     )
-    public ResponseEntity<?> gameStatus(
+    public ResponseEntity<?> statusRequest(
             @PathVariable("gameId") String gameId) {
+        boolean isExist = xl.isGameIdExist(gameId);
+        if (!isExist) {
+            return jsonError(
+                    ValidationServices.GAME_NOT_FOUND.formatted(gameId),
+                    HttpStatus.BAD_REQUEST
+            );
+        }
+
         GameStatus gameStatus = validationServices.getStatusByGameId(gameId);
 
         GameStatusOutput output = new GameStatusOutput();

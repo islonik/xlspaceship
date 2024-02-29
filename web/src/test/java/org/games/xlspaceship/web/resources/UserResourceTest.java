@@ -1,10 +1,12 @@
 package org.games.xlspaceship.web.resources;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.games.xlspaceship.impl.game.GameStatus;
 import org.games.xlspaceship.impl.game.GameTurn;
 import org.games.xlspaceship.impl.game.GridStatus;
 import org.games.xlspaceship.impl.model.ErrorResponse;
+import org.games.xlspaceship.impl.model.FireRequest;
 import org.games.xlspaceship.impl.model.SpaceshipProtocol;
 import org.games.xlspaceship.impl.services.GridServices;
 import org.games.xlspaceship.impl.services.RestServices;
@@ -18,6 +20,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.HttpServerErrorException;
 
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.mockito.Mockito.*;
 
@@ -193,6 +197,45 @@ public class UserResourceTest {
                 objectMapper
                         .writerWithDefaultPrettyPrinter()
                         .writeValueAsString(errorResponse.getBody())
+        );
+    }
+
+    @Test
+    void testFireRequestMoreThanFive() throws JsonProcessingException {
+        var restServices = mock(RestServices.class);
+        var shipServices = mock(XLSpaceshipServices.class);
+        var gridServices = mock(GridServices.class);
+
+        var validServices = new ValidationServices(shipServices);
+
+        when(shipServices.isGameIdExist(anyString())).thenReturn(false);
+
+        UserResource userResource = new UserResource(
+                validServices, restServices, shipServices, gridServices
+        );
+
+        List<String> salvo6 = new ArrayList<>();
+        salvo6.add("0x0");
+        salvo6.add("1x1");
+        salvo6.add("2x2");
+        salvo6.add("3x3");
+        salvo6.add("4x4");
+        salvo6.add("5x5");
+        FireRequest fireRequestMoreThanFive = new FireRequest();
+        fireRequestMoreThanFive.setSalvo(salvo6);
+
+        ResponseEntity<?> fireResponseMoreThanFive = userResource.fireRequest(
+                "match-1-1",
+                fireRequestMoreThanFive);
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        Assertions.assertEquals("""
+                {
+                  "error_message" : "More then 5 shots!"
+                }""",
+                objectMapper
+                        .writerWithDefaultPrettyPrinter()
+                        .writeValueAsString(fireResponseMoreThanFive.getBody())
         );
     }
 
