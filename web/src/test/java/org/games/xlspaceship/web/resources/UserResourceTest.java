@@ -4,14 +4,13 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.games.xlspaceship.impl.game.GameStatus;
 import org.games.xlspaceship.impl.game.GameTurn;
+import org.games.xlspaceship.impl.game.Grid;
 import org.games.xlspaceship.impl.game.GridStatus;
+import org.games.xlspaceship.impl.game.ships.Winger;
 import org.games.xlspaceship.impl.model.ErrorResponse;
 import org.games.xlspaceship.impl.model.FireRequest;
 import org.games.xlspaceship.impl.model.SpaceshipProtocol;
-import org.games.xlspaceship.impl.services.GridServices;
-import org.games.xlspaceship.impl.services.RestServices;
-import org.games.xlspaceship.impl.services.ValidationServices;
-import org.games.xlspaceship.impl.services.XLSpaceshipServices;
+import org.games.xlspaceship.impl.services.*;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
@@ -34,24 +33,8 @@ public class UserResourceTest {
         var shipServices = mock(XLSpaceshipServices.class);
         var gridServices = mock(GridServices.class);
 
-        GameTurn gameTurn = new GameTurn();
-        gameTurn.setPlayerTurn("nikilipa");
-
-        GridStatus myStatus = new GridStatus();
-        myStatus.setUserId("nikilipa");
-        GridStatus aiStatus = new GridStatus();
-        aiStatus.setUserId("ai-500");
-
-        GameStatus expectedGameStatus = new GameStatus();
-        expectedGameStatus.setHost("localhost");
-        expectedGameStatus.setPort(8080);
-        expectedGameStatus.setAliveShips(5);
-        expectedGameStatus.setGameTurn(gameTurn);
-        expectedGameStatus.setSelf(myStatus);
-        expectedGameStatus.setOpponent(aiStatus);
-
         when(shipServices.isGameIdExist(anyString())).thenReturn(true);
-        when(shipServices.status(anyString())).thenReturn(expectedGameStatus);
+        when(shipServices.status(anyString())).thenReturn(createGameStatus());
 
         UserResource userResource = new UserResource(
                 validServices, restServices, shipServices, gridServices
@@ -65,7 +48,7 @@ public class UserResourceTest {
                 {
                   "self" : {
                     "user_id" : "nikilipa",
-                    "board" : [ ]
+                    "board" : [ "*.*.............", "*.*.............", ".*..............", "*.*.............", "*.*.............", "................", "................", "................", "................", "................", "................", "................", "................", "................", "................", "................" ]
                   },
                   "opponent" : {
                     "user_id" : "ai-500",
@@ -151,23 +134,7 @@ public class UserResourceTest {
 
         var validServices = new ValidationServices(shipServices);
 
-        GameTurn gameTurn = new GameTurn();
-        gameTurn.setPlayerTurn("nikilipa");
-
-        GridStatus myStatus = new GridStatus();
-        myStatus.setUserId("nikilipa");
-        GridStatus aiStatus = new GridStatus();
-        aiStatus.setUserId("ai-500");
-
-        GameStatus expectedGameStatus = new GameStatus();
-        expectedGameStatus.setHost("localhost");
-        expectedGameStatus.setPort(8080);
-        expectedGameStatus.setAliveShips(5);
-        expectedGameStatus.setGameTurn(gameTurn);
-        expectedGameStatus.setSelf(myStatus);
-        expectedGameStatus.setOpponent(aiStatus);
-
-        when(shipServices.status(anyString())).thenReturn(expectedGameStatus);
+        when(shipServices.status(anyString())).thenReturn(createGameStatus());
         when(restServices.getCurrentHostname()).thenReturn("127.0.0.1");
         when(restServices.getCurrentPort()).thenReturn(8081);
         when(restServices.sendPostNewGameRequest(anyString(), anyInt(), any()))
@@ -237,6 +204,89 @@ public class UserResourceTest {
                         .writerWithDefaultPrettyPrinter()
                         .writeValueAsString(fireResponseMoreThanFive.getBody())
         );
+    }
+
+    @Test
+    public void testStatusRequestGameNotExists() throws Exception {
+        var restServices = mock(RestServices.class);
+        var shipServices = mock(XLSpaceshipServices.class);
+        var gridServices = mock(GridServices.class);
+
+        var validServices = new ValidationServices(shipServices);
+
+        when(shipServices.isGameIdExist(anyString())).thenReturn(false);
+
+        UserResource userResource = new UserResource(
+                validServices, restServices, shipServices, gridServices
+        );
+
+        ResponseEntity<?> errorResponse = userResource.statusRequest("match-1-1");
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        Assertions.assertEquals("""
+                {
+                  "error_message" : "Game ('match-1-1') is not found!"
+                }""",
+                objectMapper
+                        .writerWithDefaultPrettyPrinter()
+                        .writeValueAsString(errorResponse.getBody())
+        );
+    }
+
+    @Test
+    public void testStatusRequestGameExists() throws Exception {
+        var restServices = mock(RestServices.class);
+        var shipServices = mock(XLSpaceshipServices.class);
+
+        var gridServices = new GridServices(new RandomServices());
+        var validServices = new ValidationServices(shipServices);
+
+        when(shipServices.isGameIdExist(anyString())).thenReturn(true);
+        when(validServices.getStatusByGameId(anyString())).thenReturn(createGameStatus());
+
+        UserResource userResource = new UserResource(
+                validServices, restServices, shipServices, gridServices
+        );
+
+        ResponseEntity<?> gameStatus = userResource.statusRequest("match-1-1");
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        Assertions.assertEquals("""
+                {
+                  "grid" : "<table><tr class=\\"row\\"><td class=\\"ship\\"/><td class=\\"empty\\"/><td class=\\"ship\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/></tr><tr class=\\"row\\"><td class=\\"ship\\"/><td class=\\"empty\\"/><td class=\\"ship\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/></tr><tr class=\\"row\\"><td class=\\"empty\\"/><td class=\\"ship\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/></tr><tr class=\\"row\\"><td class=\\"ship\\"/><td class=\\"empty\\"/><td class=\\"ship\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/></tr><tr class=\\"row\\"><td class=\\"ship\\"/><td class=\\"empty\\"/><td class=\\"ship\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/></tr><tr class=\\"row\\"><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/></tr><tr class=\\"row\\"><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/></tr><tr class=\\"row\\"><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/></tr><tr class=\\"row\\"><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/></tr><tr class=\\"row\\"><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/></tr><tr class=\\"row\\"><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/></tr><tr class=\\"row\\"><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/></tr><tr class=\\"row\\"><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/></tr><tr class=\\"row\\"><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/></tr><tr class=\\"row\\"><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/></tr><tr class=\\"row\\"><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/><td class=\\"empty\\"/></tr></table>",
+                  "game" : {
+                    "player_turn" : "nikilipa"
+                  },
+                  "aliveShips" : 5
+                }""",
+                objectMapper
+                        .writerWithDefaultPrettyPrinter()
+                        .writeValueAsString(gameStatus.getBody())
+        );
+    }
+
+    private GameStatus createGameStatus() {
+        GameTurn gameTurn = new GameTurn();
+        gameTurn.setPlayerTurn("nikilipa");
+
+        GridStatus myStatus = new GridStatus();
+        myStatus.setUserId("nikilipa");
+        Winger winger1 = new Winger( 1);
+        Grid grid = new Grid();
+        grid.printSpaceship(0, 0, winger1);
+        myStatus.setGrid(grid);
+
+        GridStatus aiStatus = new GridStatus();
+        aiStatus.setUserId("ai-500");
+
+        GameStatus expectedGameStatus = new GameStatus();
+        expectedGameStatus.setHost("localhost");
+        expectedGameStatus.setPort(8080);
+        expectedGameStatus.setAliveShips(5);
+        expectedGameStatus.setGameTurn(gameTurn);
+        expectedGameStatus.setSelf(myStatus);
+        expectedGameStatus.setOpponent(aiStatus);
+        return expectedGameStatus;
     }
 
 
