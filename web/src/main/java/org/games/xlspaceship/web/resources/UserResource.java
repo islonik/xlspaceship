@@ -5,10 +5,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.games.xlspaceship.impl.game.GameStatus;
-import org.games.xlspaceship.impl.model.FireRequest;
-import org.games.xlspaceship.impl.model.GameStatusOutput;
-import org.games.xlspaceship.impl.model.NewGameResponse;
-import org.games.xlspaceship.impl.model.SpaceshipProtocol;
+import org.games.xlspaceship.impl.model.*;
 import org.games.xlspaceship.impl.services.GridServices;
 import org.games.xlspaceship.impl.services.RestServices;
 import org.games.xlspaceship.impl.services.ValidationServices;
@@ -54,13 +51,9 @@ public class UserResource {
     )
     public ResponseEntity<?> getStatusByGameId(
             @PathVariable("gameId") String gameId) {
-
-        boolean isExist = xl.isGameIdExist(gameId);
-        if (!isExist) {
-            return RestResources.jsonError(
-                    String.format(ValidationServices.GAME_NOT_FOUND, gameId),
-                    HttpStatus.BAD_REQUEST
-            );
+        ResponseEntity<ErrorResponse> gameNotFoundResponse = validationServices.validateGameIdExist(gameId);
+        if (gameNotFoundResponse != null) {
+            return gameNotFoundResponse;
         }
         return new ResponseEntity<Object>(
                 xl.status(gameId),
@@ -134,6 +127,19 @@ public class UserResource {
     )
     public ResponseEntity<?> createNewGame(
             @PathVariable("gameId") String gameId) {
+        ResponseEntity<ErrorResponse> gameNotFoundResponse = validationServices.validateGameIdExist(gameId);
+        if (gameNotFoundResponse == null) {
+            GameStatus gameStatus = validationServices.getStatusByGameId(gameId);
+
+            String name = gameStatus.getGameTurn().getWon();
+            if (name == null) { // check if previous game ended or not
+                return RestResources.jsonError(
+                        ValidationServices.GAME_ALREADY_EXISTS.formatted(gameId),
+                        HttpStatus.BAD_REQUEST
+                );
+            }
+        }
+
         GameStatus gameStatus = validationServices.getStatusByGameId(gameId);
 
         String removeHost = gameStatus.getHost();
@@ -216,6 +222,11 @@ public class UserResource {
     public ResponseEntity<?> fireRequest(
             @PathVariable("gameId") String gameId,
             @RequestBody FireRequest fireRequestByMyself) {
+        ResponseEntity<ErrorResponse> gameNotFoundResponse = validationServices.validateGameIdExist(gameId);
+        if (gameNotFoundResponse != null) {
+            return gameNotFoundResponse;
+        }
+
         ResponseEntity<?> validResponse = validationServices.validateFireRequest(fireRequestByMyself);
         if (validResponse != null) {
             return validResponse;
@@ -254,12 +265,9 @@ public class UserResource {
     )
     public ResponseEntity<?> statusRequest(
             @PathVariable("gameId") String gameId) {
-        boolean isExist = xl.isGameIdExist(gameId);
-        if (!isExist) {
-            return jsonError(
-                    ValidationServices.GAME_NOT_FOUND.formatted(gameId),
-                    HttpStatus.BAD_REQUEST
-            );
+        ResponseEntity<ErrorResponse> gameNotFoundResponse = validationServices.validateGameIdExist(gameId);
+        if (gameNotFoundResponse != null) {
+            return gameNotFoundResponse;
         }
 
         GameStatus gameStatus = validationServices.getStatusByGameId(gameId);

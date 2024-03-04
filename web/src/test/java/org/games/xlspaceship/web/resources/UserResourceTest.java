@@ -33,7 +33,7 @@ public class UserResourceTest {
         var shipServices = mock(XLSpaceshipServices.class);
         var gridServices = mock(GridServices.class);
 
-        when(shipServices.isGameIdExist(anyString())).thenReturn(true);
+        when(validServices.validateGameIdExist(anyString())).thenReturn(null);
         when(shipServices.status(anyString())).thenReturn(createGameStatus());
 
         UserResource userResource = new UserResource(
@@ -66,12 +66,17 @@ public class UserResourceTest {
 
     @Test
     public void testGetStatusByGameIdWhenGameDoesNotExist() throws Exception {
+        String gameId = "game-1-2-3";
         var validServices = mock(ValidationServices.class);
         var restServices = mock(RestServices.class);
         var shipServices = mock(XLSpaceshipServices.class);
         var gridServices = mock(GridServices.class);
 
-        when(shipServices.isGameIdExist(anyString())).thenReturn(false);
+        ErrorResponse errorResponse = new ErrorResponse();
+        errorResponse.setError(ValidationServices.GAME_NOT_FOUND.formatted(gameId));
+        ResponseEntity<ErrorResponse> expectedErrorEntity = ResponseEntity.ok(errorResponse);
+
+        when(validServices.validateGameIdExist(anyString())).thenReturn(expectedErrorEntity);
 
         UserResource userResource = new UserResource(
                 validServices, restServices, shipServices, gridServices
@@ -100,8 +105,6 @@ public class UserResourceTest {
         var gridServices = mock(GridServices.class);
 
         var validServices = new ValidationServices(shipServices);
-
-        when(shipServices.isGameIdExist(anyString())).thenReturn(false);
 
         UserResource userResource = new UserResource(
                 validServices, restServices, shipServices, gridServices
@@ -133,7 +136,7 @@ public class UserResourceTest {
         var gridServices = mock(GridServices.class);
 
         var validServices = new ValidationServices(shipServices);
-
+        when(shipServices.isGameIdExist(anyString())).thenReturn(false);
         when(shipServices.status(anyString())).thenReturn(createGameStatus());
         when(restServices.getCurrentHostname()).thenReturn("127.0.0.1");
         when(restServices.getCurrentPort()).thenReturn(8081);
@@ -168,6 +171,35 @@ public class UserResourceTest {
     }
 
     @Test
+    public void testCreateNewGameSuchGameAlreadyExist() throws Exception {
+        var restServices = mock(RestServices.class);
+        var shipServices = mock(XLSpaceshipServices.class);
+        var gridServices = mock(GridServices.class);
+
+        var validServices = new ValidationServices(shipServices);
+        when(shipServices.isGameIdExist(anyString())).thenReturn(true);
+        when(shipServices.status(anyString())).thenReturn(createGameStatus());
+
+        UserResource userResource = new UserResource(
+                validServices, restServices, shipServices, gridServices
+        );
+
+        ResponseEntity<?> errorResponse = userResource.createNewGame("match-1-3-6");
+
+        Assertions.assertNotNull(errorResponse);
+        Assertions.assertInstanceOf(ErrorResponse.class, errorResponse.getBody());
+        ObjectMapper objectMapper = new ObjectMapper();
+        Assertions.assertEquals("""
+                {
+                  "error_message" : "Such game = 'match-1-3-6' already exists."
+                }""",
+                objectMapper
+                        .writerWithDefaultPrettyPrinter()
+                        .writeValueAsString(errorResponse.getBody())
+        );
+    }
+
+    @Test
     void testFireRequestMoreThanFive() throws JsonProcessingException {
         var restServices = mock(RestServices.class);
         var shipServices = mock(XLSpaceshipServices.class);
@@ -175,7 +207,7 @@ public class UserResourceTest {
 
         var validServices = new ValidationServices(shipServices);
 
-        when(shipServices.isGameIdExist(anyString())).thenReturn(false);
+        when(shipServices.isGameIdExist(anyString())).thenReturn(true);
 
         UserResource userResource = new UserResource(
                 validServices, restServices, shipServices, gridServices
@@ -207,7 +239,7 @@ public class UserResourceTest {
     }
 
     @Test
-    public void testStatusRequestGameNotExists() throws Exception {
+    void testFireRequestGameNotExist() throws JsonProcessingException {
         var restServices = mock(RestServices.class);
         var shipServices = mock(XLSpaceshipServices.class);
         var gridServices = mock(GridServices.class);
@@ -220,7 +252,19 @@ public class UserResourceTest {
                 validServices, restServices, shipServices, gridServices
         );
 
-        ResponseEntity<?> errorResponse = userResource.statusRequest("match-1-1");
+        List<String> salvo6 = new ArrayList<>();
+        salvo6.add("0x0");
+        salvo6.add("1x1");
+        salvo6.add("2x2");
+        salvo6.add("3x3");
+        salvo6.add("4x4");
+        salvo6.add("5x5");
+        FireRequest fireRequestMoreThanFive = new FireRequest();
+        fireRequestMoreThanFive.setSalvo(salvo6);
+
+        ResponseEntity<?> fireResponseMoreThanFive = userResource.fireRequest(
+                "match-1-1",
+                fireRequestMoreThanFive);
 
         ObjectMapper objectMapper = new ObjectMapper();
         Assertions.assertEquals("""
@@ -229,7 +273,35 @@ public class UserResourceTest {
                 }""",
                 objectMapper
                         .writerWithDefaultPrettyPrinter()
-                        .writeValueAsString(errorResponse.getBody())
+                        .writeValueAsString(fireResponseMoreThanFive.getBody())
+        );
+    }
+
+    @Test
+    public void testStatusRequestGameNotExists() throws Exception {
+        String gameId = "match-1-1";
+        var restServices = mock(RestServices.class);
+        var shipServices = mock(XLSpaceshipServices.class);
+        var gridServices = mock(GridServices.class);
+
+        var validServices = new ValidationServices(shipServices);
+
+        when(shipServices.isGameIdExist(anyString())).thenReturn(false);
+
+        UserResource userResource = new UserResource(
+                validServices, restServices, shipServices, gridServices
+        );
+
+        ResponseEntity<?> actualErrorEntity = userResource.statusRequest(gameId);
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        Assertions.assertEquals("""
+                {
+                  "error_message" : "Game ('match-1-1') is not found!"
+                }""",
+                objectMapper
+                        .writerWithDefaultPrettyPrinter()
+                        .writeValueAsString(actualErrorEntity.getBody())
         );
     }
 

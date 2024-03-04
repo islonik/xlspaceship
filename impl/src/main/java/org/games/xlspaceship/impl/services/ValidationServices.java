@@ -1,7 +1,9 @@
 package org.games.xlspaceship.impl.services;
 
 import lombok.RequiredArgsConstructor;
+import org.games.xlspaceship.impl.RestResources;
 import org.games.xlspaceship.impl.game.GameStatus;
+import org.games.xlspaceship.impl.model.ErrorResponse;
 import org.games.xlspaceship.impl.model.FireRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,6 +15,7 @@ import static org.games.xlspaceship.impl.RestResources.jsonError;
 @RequiredArgsConstructor
 public class ValidationServices {
 
+    public static final String GAME_ALREADY_EXISTS = "Such game = '%s' already exists.";
     public static final String MORE_THEN_5 = "More then 5 shots!";
     public static final String WRONG_TURN = "It's not your turn.";
     public static final String WRONG_SHOT_FORMAT = "Wrong format. Shot = '%s'.";
@@ -23,6 +26,15 @@ public class ValidationServices {
     private static final Object lockShotByMyself = new Object();
 
     private final XLSpaceshipServices xl;
+
+    public ResponseEntity<ErrorResponse> validateGameIdExist(String gameId) {
+        boolean isGameExist = xl.isGameIdExist(gameId);
+
+        return isGameExist ? null : RestResources.jsonError(
+                ValidationServices.GAME_NOT_FOUND.formatted(gameId),
+                HttpStatus.BAD_REQUEST
+        );
+    }
 
     public ResponseEntity<?> validateFireRequest(FireRequest fireRequest) {
         if (fireRequest.getSalvo().size() > 5) {
@@ -70,9 +82,9 @@ public class ValidationServices {
     }
 
     public ResponseEntity<?> shotByOpponent(String gameId, FireRequest fireRequestFromOpponent) {
-        boolean isExist = xl.isGameIdExist(gameId);
-        if (!isExist) {
-            return jsonError(String.format(GAME_NOT_FOUND, gameId), HttpStatus.BAD_REQUEST);
+        ResponseEntity<ErrorResponse> gameNotFoundResponse = validateGameIdExist(gameId);
+        if (gameNotFoundResponse != null) {
+            return gameNotFoundResponse;
         }
         boolean turnIsAllowed = xl.isOpponentTurn(gameId);
         if (turnIsAllowed) {
@@ -90,9 +102,9 @@ public class ValidationServices {
     }
 
     public ResponseEntity<?> shotByMyself(String gameId, FireRequest fireRequestFromOpponent) {
-        boolean isExist = xl.isGameIdExist(gameId);
-        if (!isExist) {
-            return jsonError(String.format(GAME_NOT_FOUND, gameId), HttpStatus.BAD_REQUEST);
+        ResponseEntity<ErrorResponse> gameNotFoundResponse = validateGameIdExist(gameId);
+        if (gameNotFoundResponse != null) {
+            return gameNotFoundResponse;
         }
         boolean turnIsAllowed = xl.isMyselfTurn(gameId);
         if (turnIsAllowed) {

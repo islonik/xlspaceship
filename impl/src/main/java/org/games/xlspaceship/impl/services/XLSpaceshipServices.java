@@ -4,14 +4,14 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.RequiredArgsConstructor;
+import org.games.xlspaceship.impl.RestResources;
 import org.games.xlspaceship.impl.game.GameStatus;
 import org.games.xlspaceship.impl.game.GameTurn;
 import org.games.xlspaceship.impl.game.Grid;
 import org.games.xlspaceship.impl.game.GridStatus;
-import org.games.xlspaceship.impl.model.FireRequest;
-import org.games.xlspaceship.impl.model.FireResponse;
-import org.games.xlspaceship.impl.model.NewGameRequest;
-import org.games.xlspaceship.impl.model.NewGameResponse;
+import org.games.xlspaceship.impl.model.*;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 @Service
