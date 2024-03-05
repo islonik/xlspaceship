@@ -2,6 +2,7 @@ package org.games.xlspaceship.web.resources;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.games.xlspaceship.impl.game.GameStatus;
@@ -18,8 +19,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestClientException;
 
 import java.net.ConnectException;
-
-import static org.games.xlspaceship.impl.RestResources.jsonError;
 
 @Slf4j
 @RestController
@@ -52,13 +51,10 @@ public class UserResource {
     public ResponseEntity<?> getStatusByGameId(
             @PathVariable("gameId") String gameId) {
         ResponseEntity<ErrorResponse> gameNotFoundResponse = validationServices.validateGameIdExist(gameId);
-        if (gameNotFoundResponse != null) {
-            return gameNotFoundResponse;
-        }
-        return new ResponseEntity<Object>(
+        return Objects.requireNonNullElseGet(gameNotFoundResponse, () -> new ResponseEntity<Object>(
                 xl.status(gameId),
                 HttpStatus.OK
-        );
+        ));
     }
 
     /*
@@ -157,7 +153,7 @@ public class UserResource {
                 removeHost, removePort, restServices.getCurrentHostname(), restServices.getCurrentPort()
         );
 
-        NewGameResponse newGameResponse = null;
+        NewGameResponse newGameResponse;
         try {
             newGameResponse = restServices.sendPostNewGameRequest(removeHost, removePort, outgoingSp);
         } catch (RestClientException rce) {
