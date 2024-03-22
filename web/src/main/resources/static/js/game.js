@@ -6,9 +6,9 @@ document.addEventListener("DOMContentLoaded", (event) => {
 });
 
 function updatePageAfterAiFirstTurn() {
-    var opponentId = document.getElementById("opponentId").value;
-    var playerTurnId = document.getElementById("playerTurnId").value;
-    var gameId = document.getElementById("gameId").value;
+    let opponentId = document.getElementById("opponentId").value;
+    let playerTurnId = document.getElementById("playerTurnId").value;
+    let gameId = document.getElementById("gameId").value;
 
     if (opponentId === playerTurnId) { // AI made first turn so we need to update our page
         updateMyGrid(gameId);
@@ -16,23 +16,23 @@ function updatePageAfterAiFirstTurn() {
 }
 
 function addShot(event) {
-    var userId = document.getElementById("userId").value;
-    var playerTurnId = document.getElementById("playerTurnId").value;
+    let userId = document.getElementById("userId").value;
+    let playerTurnId = document.getElementById("playerTurnId").value;
 
     if (userId == playerTurnId) { // ignore mouse clicks while it's not your turn
-        var aliveShips = document.getElementById("aliveShips").value;
+        let aliveShips = document.getElementById("aliveShips").value;
 
-        var imgId = event.id;
+        let imgId = event.id;
 
         document.getElementById(imgId).removeAttribute("onclick");
         document.getElementById(imgId).setAttribute("class", "shot");
 
         // get salvo
-        var salvo = document.getElementById("salvo").value;
+        let salvo = document.getElementById("salvo").value;
         salvo = salvo + imgId;
 
         // get salvoCount
-        var salvoCount = parseInt(document.getElementById("salvoCount").value);
+        let salvoCount = parseInt(document.getElementById("salvoCount").value);
         // update salvoCount
         salvoCount = salvoCount + 1;
         // save salvoCount
@@ -54,22 +54,22 @@ function addShot(event) {
 }
 
 function sendFireRequest(salvo) {
-    var gameId = document.getElementById("gameId").value;
+    let gameId = document.getElementById("gameId").value;
 
-    var array = new Array();
+    let array = new Array();
     array = salvo.split(",");
 
-    var fireRequest = {}
+    let fireRequest = {}
     fireRequest["salvo"] = array;
 
-    var httpRequest = new XMLHttpRequest();
+    let httpRequest = new XMLHttpRequest();
 
     httpRequest.onreadystatechange = function() {
         if (httpRequest.readyState == XMLHttpRequest.DONE) { // XMLHttpRequest.DONE == 4
             if (httpRequest.status == 200) {
-                var fireResponse = JSON.parse(httpRequest.responseText);
-                var game = fireResponse.game;
-                var salvo = fireResponse.salvo;
+                let fireResponse = JSON.parse(httpRequest.responseText);
+                let game = fireResponse.game;
+                let salvo = fireResponse.salvo;
 
                 // update opponent grid
                 for (const [key, value] of Object.entries(salvo)) {
@@ -87,7 +87,7 @@ function sendFireRequest(salvo) {
                     updateMyGrid(gameId);
                 }
             } else {
-                var jsonError = JSON.parse(httpRequest.responseText);
+                let jsonError = JSON.parse(httpRequest.responseText);
                 alert(jsonError.error_message); // show message
                 // very crude approach as we are trying to resolve it with page update
                 window.location.href = "/gameId/" + gameId;
@@ -102,13 +102,13 @@ function sendFireRequest(salvo) {
 
 function updateMyGrid(gameId) {
     setTimeout(() => {
-        var httpRequest = new XMLHttpRequest();
+        let httpRequest = new XMLHttpRequest();
         httpRequest.onreadystatechange = function() {
             if (httpRequest.readyState == XMLHttpRequest.DONE) { // XMLHttpRequest.DONE == 4
                 if (httpRequest.status == 200) {
-                    var gameStatus = JSON.parse(httpRequest.responseText);
+                    let gameStatus = JSON.parse(httpRequest.responseText);
 
-                    var myGrid = document.getElementById('myGrid');
+                    let myGrid = document.getElementById('myGrid');
                     myGrid.innerHTML = gameStatus.grid;
 
                     updateGameTurn(gameStatus.game);
@@ -117,7 +117,7 @@ function updateMyGrid(gameId) {
                         document.getElementById("aliveShips").value = gameStatus.aliveShips;
                     }
                 } else {
-                    var jsonError = JSON.parse(httpRequest.responseText);
+                    let jsonError = JSON.parse(httpRequest.responseText);
                     alert(jsonError.error_message); // show message
                     // very crude approach as we are trying to resolve it with page update
                     window.location.href = "/gameId/" + gameId;
@@ -149,9 +149,9 @@ function updateGameTurn(gameTurn) {
 }
 
 function checkGameOver() {
-    var userId = document.getElementById("userId").value;
-    var opponentId = document.getElementById("opponentId").value;
-    var wonId = document.getElementById("wonId").value;
+    let userId = document.getElementById("userId").value;
+    let opponentId = document.getElementById("opponentId").value;
+    let wonId = document.getElementById("wonId").value;
 
     if (userId === wonId) {
         alert("You won!");
@@ -172,17 +172,17 @@ function proposeNewGame() {
 }
 
 function createNewGame() {
-    var gameId = document.getElementById("gameId").value;
+    let gameId = document.getElementById("gameId").value;
 
-    var httpRequest = new XMLHttpRequest();
+    let httpRequest = new XMLHttpRequest();
 
     httpRequest.onreadystatechange = function() {
         if (httpRequest.readyState == XMLHttpRequest.DONE) { // XMLHttpRequest.DONE == 4
             if (httpRequest.status == 200) {
-                var id = JSON.parse(httpRequest.responseText).game_id;
+                let id = JSON.parse(httpRequest.responseText).game_id;
                 window.location.href = "/gameId/" + id;
             } else {
-                var jsonError = JSON.parse(httpRequest.responseText);
+                let jsonError = JSON.parse(httpRequest.responseText);
                 alert(jsonError.error_message); // very crude approach
             }
         }

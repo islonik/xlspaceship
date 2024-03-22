@@ -15,25 +15,25 @@ function createNewGameViaAjax(event) {
     const data = new FormData(event.target);
     const dataObject = Object.fromEntries(data.entries());
 
-    var sp = {}
+    let sp = {}
     sp["hostname"] = data.get("hostname");
     sp["port"] = data.get("port");
 
-    var jsonData = JSON.stringify(sp)
+    let jsonData = JSON.stringify(sp)
 
     sendAjaxRequest(jsonData);
 }
 
 function sendAjaxRequest(jsonData) {
-    var httpRequest = new XMLHttpRequest();
+    let httpRequest = new XMLHttpRequest();
 
     httpRequest.onreadystatechange = function() {
         if (httpRequest.readyState == XMLHttpRequest.DONE) { // XMLHttpRequest.DONE == 4
             if (httpRequest.status == 200) {
-                var id = JSON.parse(httpRequest.responseText).game_id;
+                let id = JSON.parse(httpRequest.responseText).game_id;
                 window.location.href = "/gameId/" + id;
             } else {
-                var jsonError = JSON.parse(httpRequest.responseText);
+                let jsonError = JSON.parse(httpRequest.responseText);
                 alert(jsonError.error_message); // very crude approach
             }
         }
