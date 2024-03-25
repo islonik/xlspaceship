@@ -223,7 +223,7 @@ public class UserResourceTest {
         FireRequest fireRequestMoreThanFive = new FireRequest();
         fireRequestMoreThanFive.setSalvo(salvo6);
 
-        ResponseEntity<?> fireResponseMoreThanFive = userResource.fireRequest(
+        ResponseEntity<?> fireResponseMoreThanFive = userResource.fireInEnemy(
                 "match-1-1",
                 fireRequestMoreThanFive);
 
@@ -262,7 +262,7 @@ public class UserResourceTest {
         FireRequest fireRequestMoreThanFive = new FireRequest();
         fireRequestMoreThanFive.setSalvo(salvo6);
 
-        ResponseEntity<?> fireResponseMoreThanFive = userResource.fireRequest(
+        ResponseEntity<?> fireResponseMoreThanFive = userResource.fireInEnemy(
                 "match-1-1",
                 fireRequestMoreThanFive);
 

@@ -95,7 +95,7 @@ public class ProtocolResource {
             produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.APPLICATION_JSON_VALUE
     )
-    public ResponseEntity<?> shotByOpponent(
+    public ResponseEntity<?> fireFromEnemy(
             @PathVariable("gameId") String gameId,
             @RequestBody FireRequest fireRequestByOpponent) {
         ResponseEntity<?> validResponse = validationServices.validateFireRequest(fireRequestByOpponent);
@@ -103,7 +103,7 @@ public class ProtocolResource {
             return validResponse;
         }
 
-        return validationServices.shotByOpponent(gameId, fireRequestByOpponent);
+        return validationServices.fireFromEnemy(gameId, fireRequestByOpponent);
     }
 
 }

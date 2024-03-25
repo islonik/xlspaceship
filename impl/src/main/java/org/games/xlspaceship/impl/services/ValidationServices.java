@@ -81,7 +81,7 @@ public class ValidationServices {
         return xl.status(gameId);
     }
 
-    public ResponseEntity<?> shotByOpponent(String gameId, FireRequest fireRequestFromOpponent) {
+    public ResponseEntity<?> fireFromEnemy(String gameId, FireRequest fireRequestFromOpponent) {
         ResponseEntity<ErrorResponse> gameNotFoundResponse = validateGameIdExist(gameId);
         if (gameNotFoundResponse != null) {
             return gameNotFoundResponse;
@@ -92,7 +92,7 @@ public class ValidationServices {
                 turnIsAllowed = xl.isOpponentTurn(gameId);
                 if (turnIsAllowed) {
                     return new ResponseEntity<Object>(
-                            xl.shotByOpponent(gameId, fireRequestFromOpponent),
+                            xl.fireFromEnemy(gameId, fireRequestFromOpponent),
                             HttpStatus.OK
                     );
                 }
@@ -101,7 +101,7 @@ public class ValidationServices {
         return jsonError(WRONG_TURN, HttpStatus.BAD_REQUEST);
     }
 
-    public ResponseEntity<?> shotByMyself(String gameId, FireRequest fireRequestFromOpponent) {
+    public ResponseEntity<?> fireInEnemy(String gameId, FireRequest fireRequestFromOpponent) {
         ResponseEntity<ErrorResponse> gameNotFoundResponse = validateGameIdExist(gameId);
         if (gameNotFoundResponse != null) {
             return gameNotFoundResponse;
@@ -112,7 +112,7 @@ public class ValidationServices {
                 turnIsAllowed = xl.isMyselfTurn(gameId);
                 if (turnIsAllowed) {
                     return new ResponseEntity<Object>(
-                            xl.shotByMyself(gameId, fireRequestFromOpponent),
+                            xl.fireInEnemy(gameId, fireRequestFromOpponent),
                             HttpStatus.OK
                     );
                 }

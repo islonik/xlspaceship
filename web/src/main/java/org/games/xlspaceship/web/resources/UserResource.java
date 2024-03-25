@@ -215,7 +215,7 @@ public class UserResource {
             produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.APPLICATION_JSON_VALUE
     )
-    public ResponseEntity<?> fireRequest(
+    public ResponseEntity<?> fireInEnemy(
             @PathVariable("gameId") String gameId,
             @RequestBody FireRequest fireRequestByMyself) {
         ResponseEntity<ErrorResponse> gameNotFoundResponse = validationServices.validateGameIdExist(gameId);
@@ -228,7 +228,7 @@ public class UserResource {
             return validResponse;
         }
 
-        return validationServices.shotByMyself(gameId, fireRequestByMyself);
+        return validationServices.fireInEnemy(gameId, fireRequestByMyself);
     }
 
     /*
@@ -256,8 +256,7 @@ public class UserResource {
     @RequestMapping(
             value = "/game/{gameId}/status",
             method = RequestMethod.GET,
-            produces = MediaType.APPLICATION_JSON_VALUE,
-            consumes = MediaType.APPLICATION_JSON_VALUE
+            produces = MediaType.APPLICATION_JSON_VALUE
     )
     public ResponseEntity<?> statusRequest(
             @PathVariable("gameId") String gameId) {

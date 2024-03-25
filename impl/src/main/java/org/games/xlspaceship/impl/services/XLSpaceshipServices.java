@@ -118,7 +118,7 @@ public class XLSpaceshipServices {
         return myselfId.equalsIgnoreCase(playerTurn);
     }
 
-    public FireResponse shotByOpponent(String gameId, FireRequest fireRequestByOpponent) {
+    public FireResponse fireFromEnemy(String gameId, FireRequest fireRequestByOpponent) {
         GameStatus gameStatus = games.get(gameId);
 
         Grid myGrid = gameStatus.getSelf().getGrid();
@@ -157,7 +157,7 @@ public class XLSpaceshipServices {
         return fireResponse;
     }
 
-    public FireResponse shotByMyself(String gameId, FireRequest fireRequestByMyself) {
+    public FireResponse fireInEnemy(String gameId, FireRequest fireRequestByMyself) {
         GameStatus gameStatus = games.get(gameId);
 
         Grid opponentGrid = gameStatus.getOpponent().getGrid();

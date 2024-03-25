@@ -1,5 +1,6 @@
 // we wait till page is loaded
 document.addEventListener("DOMContentLoaded", (event) => {
+    console.log("Page loaded.");
 
     updatePageAfterAiFirstTurn();
 
@@ -38,7 +39,6 @@ function addShot(event) {
         // save salvoCount
         document.getElementById("salvoCount").value = salvoCount;
 
-        console.log("salvoCount = " + salvoCount + " aliveShips = " + aliveShips);
         if (salvoCount >= aliveShips) {
             // send required salvo to backend
             sendFireRequest(salvo);
@@ -78,7 +78,7 @@ function sendFireRequest(salvo) {
                     }
                 }
 
-                updateGameTurn(game);
+                updateGameTurn(gameId, game, false);
 
                 // drop salvo value to empty
                 document.getElementById("salvo").value = "";
@@ -102,36 +102,40 @@ function sendFireRequest(salvo) {
 
 function updateMyGrid(gameId) {
     setTimeout(() => {
-        let httpRequest = new XMLHttpRequest();
-        httpRequest.onreadystatechange = function() {
-            if (httpRequest.readyState == XMLHttpRequest.DONE) { // XMLHttpRequest.DONE == 4
-                if (httpRequest.status == 200) {
-                    let gameStatus = JSON.parse(httpRequest.responseText);
-
-                    let myGrid = document.getElementById('myGrid');
-                    myGrid.innerHTML = gameStatus.grid;
-
-                    updateGameTurn(gameStatus.game);
-
-                    if (gameStatus.aliveShips) { // check is not nullish
-                        document.getElementById("aliveShips").value = gameStatus.aliveShips;
-                    }
-                } else {
-                    let jsonError = JSON.parse(httpRequest.responseText);
-                    alert(jsonError.error_message); // show message
-                    // very crude approach as we are trying to resolve it with page update
-                    window.location.href = "/gameId/" + gameId;
-                }
-            }
-        };
-
-        httpRequest.open("GET", "/xl-spaceship/user/game/" + gameId + "/status");
-        httpRequest.setRequestHeader('Content-Type', 'application/json; charset=utf-8');
-        httpRequest.send();
-    }, 100); // update my grid after 100 ms delay
+        fetchGameStatus(gameId);
+    }, 50); // update my grid after 50 ms delay
 }
 
-function updateGameTurn(gameTurn) {
+function fetchGameStatus(gameId) {
+    let httpRequest = new XMLHttpRequest();
+    httpRequest.onreadystatechange = function() {
+        if (httpRequest.readyState == XMLHttpRequest.DONE) { // XMLHttpRequest.DONE == 4
+            if (httpRequest.status == 200) {
+                let gameStatus = JSON.parse(httpRequest.responseText);
+
+                let myGrid = document.getElementById('myGrid');
+                myGrid.innerHTML = gameStatus.grid;
+
+                updateGameTurn(gameId, gameStatus.game, true);
+
+                if (gameStatus.aliveShips) { // check is not nullish
+                    document.getElementById("aliveShips").value = gameStatus.aliveShips;
+                }
+            } else {
+                let jsonError = JSON.parse(httpRequest.responseText);
+                alert(jsonError.error_message); // show message
+                // very crude approach as we are trying to resolve it with page update
+                window.location.href = "/gameId/" + gameId;
+            }
+        }
+    };
+
+    httpRequest.open("GET", "/xl-spaceship/user/game/" + gameId + "/status");
+    httpRequest.setRequestHeader('Content-Type', 'application/json; charset=utf-8');
+    httpRequest.send();
+}
+
+function updateGameTurn(gameId, gameTurn, isNewRequest) {
     //  ╭─ nullish ──────╮ ╭─ not nullish ─────────────────────────────────╮
     // ┌───────────┬──────┬───────┬───┬────┬─────┬──────┬───┬─────────┬─────┐
     // │ undefined │ null │ false │ 0 │ "" │ ... │ true │ 1 │ "hello" │ ... │
@@ -139,6 +143,10 @@ function updateGameTurn(gameTurn) {
     //  ╰─ falsy ───────────────────────────────╯ ╰─ truthy ───────────────╯
     if (gameTurn.player_turn) { // check is not nullish
         document.getElementById("playerTurnId").value = gameTurn.player_turn;
+
+        if (gameTurn.player_turn === 'AI' && isNewRequest) {
+            updateMyGrid(gameId);
+        }
     }
 
     if (gameTurn.won) { // check is not nullish
