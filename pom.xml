@@ -18,13 +18,13 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <spring.boot>3.2.3</spring.boot>
-        <springdoc-openapi-starter-webmvc-ui.version>2.3.0</springdoc-openapi-starter-webmvc-ui.version>
+        <spring.boot>3.2.5</spring.boot>
+        <springdoc-openapi-starter-webmvc-ui.version>2.5.0</springdoc-openapi-starter-webmvc-ui.version>
 
-        <lombok.version>1.18.30</lombok.version>
+        <lombok.version>1.18.32</lombok.version>
 
         <junit5.version>5.10.2</junit5.version>
-        <mockito.version>5.10.0</mockito.version>
+        <mockito.version>5.12.0</mockito.version>
     </properties>
 
     <dependencyManagement>
